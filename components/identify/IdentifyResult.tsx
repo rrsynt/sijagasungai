@@ -2,7 +2,7 @@
 
 import { IdentificationResult } from '@/lib/types';
 import { useLanguage } from '@/components/LanguageContext';
-import { MapPin, DollarSign, BookOpen, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Info, Copy, Check, Share2, Volume2 } from 'lucide-react';
+import { MapPin, DollarSign, BookOpen, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Info, Copy, Check, Share2, Volume2, TrendingUp, Trash2, Share } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import html2canvas from 'html2canvas';

@@ -17,9 +17,7 @@ export function OfflineBanner() {
 
     // Cek status awal setelah browser siap — navigator.onLine reliable di sini
     if (!navigator.onLine) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsOffline(true);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowBanner(true);
     }
 
