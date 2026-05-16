@@ -139,6 +139,7 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
     setMap(null);
     if (heatmapLayerRef.current) {
       heatmapLayerRef.current.setMap(null);
+      // eslint-disable-next-line react-hooks/immutability
       heatmapLayerRef.current = null;
     }
   }, []);
@@ -152,6 +153,7 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
     // Always destroy the old layer first
     if (heatmapLayerRef.current) {
       heatmapLayerRef.current.setMap(null);
+      // eslint-disable-next-line react-hooks/immutability
       heatmapLayerRef.current = null;
     }
 
@@ -177,6 +179,7 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
     return () => {
       if (heatmapLayerRef.current) {
         heatmapLayerRef.current.setMap(null);
+        // eslint-disable-next-line react-hooks/immutability
         heatmapLayerRef.current = null;
       }
     };

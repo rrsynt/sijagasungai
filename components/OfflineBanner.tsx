@@ -17,7 +17,9 @@ export function OfflineBanner() {
 
     // Cek status awal setelah browser siap — navigator.onLine reliable di sini
     if (!navigator.onLine) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsOffline(true);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowBanner(true);
     }
 
@@ -27,7 +29,6 @@ export function OfflineBanner() {
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('online', handleOnline);
     };
-    // eslint-disable-next-line react-hooks/set-state-in-effect
   }, []);
 
   if (!showBanner) return null;

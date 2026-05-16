@@ -2,7 +2,7 @@
 
 import { IdentificationResult } from '@/lib/types';
 import { useLanguage } from '@/components/LanguageContext';
-import { MapPin, DollarSign, BookOpen, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Info, Copy, Check, Share2, Trash2, TrendingUp, Download, Share, Volume2 } from 'lucide-react';
+import { MapPin, DollarSign, BookOpen, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Info, Copy, Check, Share2, Volume2 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import html2canvas from 'html2canvas';
@@ -200,36 +200,7 @@ export function IdentifyResult({ result, speciesId, uploadedImage }: IdentifyRes
         </div>
       </div>
 
-      {/* BANNER CTA — hanya untuk spesies invasif, langsung kelihatan tanpa scroll */}
-      {result.isInvasif && (
-        <div className="flex flex-col sm:flex-row gap-3 mb-8 -mx-8 sm:-mx-10 px-8 sm:px-10 py-6 bg-gray-50 border-b border-gray-200">
-          <Link
-            href={`/map?report=${encodeURIComponent(result.namaLokal)}`}
-            onClick={() => {
-              try {
-                sessionStorage.setItem('reportPrefill', JSON.stringify({
-                  speciesName: result.namaLokal,
-                  scientificName: result.namaIlmiah,
-                  imageUrl: uploadedImage || null,
-                }));
-              } catch {}
-            }}
-            className="flex-1 flex items-center justify-center gap-3 py-4 px-6 bg-primary-sunai hover:bg-primary-sunai/90 text-white font-black text-sm uppercase tracking-widest transition-colors shadow-md shadow-primary-sunai/20 rounded-xl"
-          >
-            <MapPin className="w-5 h-5 shrink-0" />
-            {t('Laporkan ke Peta Nasional', 'Report to National Map')}
-          </Link>
-          <a
-            href={`https://wa.me/?text=${encodeURIComponent(`🚨 *PERINGATAN INVASIF*\n\nSaya menemukan *${result.namaLokal}* (${result.namaIlmiah})\nStatus: *${result.statusInvasif}*\n\n${result.rekomendasiAksi ?? ''}\n\n📍 Dilaporkan via SiJaga Sungai\n#SiJagaSungai #JuaraVibeCoding`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-3 py-4 px-6 bg-[#25D366] hover:bg-[#1da851] text-white font-black text-sm uppercase tracking-widest transition-colors rounded-xl"
-          >
-            <svg className="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.374 0 0 5.373 0 12c0 2.108.549 4.086 1.508 5.808L.057 23.999l6.337-1.44A11.947 11.947 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.946a9.93 9.93 0 01-5.031-1.356l-.361-.214-3.741.981.999-3.648-.237-.375A9.95 9.95 0 012.054 12C2.054 6.501 6.502 2.054 12 2.054S21.946 6.501 21.946 12 17.498 21.946 12 21.946z"/></svg>
-            {t('Bagikan via WhatsApp', 'Share via WhatsApp')}
-          </a>
-        </div>
-      )}
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10 border-b border-gray-200 pb-10">
         <div className="space-y-8">
