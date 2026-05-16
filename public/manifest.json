@@ -1,0 +1,26 @@
+{
+  "name": "SiJaga Sungai",
+  "short_name": "SiJaga",
+  "description": "Platform citizen science berbasis AI untuk identifikasi spesies ikan invasif di perairan Indonesia.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a7a4a",
+  "theme_color": "#1a7a4a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/og-image.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/og-image.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["education", "utilities"],
+  "lang": "id"
+}
