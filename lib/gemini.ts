@@ -180,17 +180,21 @@ class GeminiService {
         return ai.models.generateContent(params);
       });
     } catch {
-      // Gemini exhausted — try Groq text fallback (for non-vision calls)
+      // Gemini exhausted — try full fallback chain (text-only calls)
       const contents = params.contents;
       const isTextOnly = typeof contents === 'string' || (Array.isArray(contents) && !JSON.stringify(contents).includes('inlineData'));
-      if (isTextOnly && groqPool.size > 0) {
+      if (isTextOnly && fallbackChain.count > 0) {
         const promptText = typeof contents === 'string' ? contents : JSON.stringify(contents);
-        const text = await groqPool.tryAll(async (apiKey) => {
-          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        const text = await fallbackChain.tryChain(async (apiKey, provider) => {
+          const res = await fetch(`${provider.baseUrl}/chat/completions`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+              ...(provider.name === 'OpenRouter' ? { 'HTTP-Referer': 'https://sijaga-sungai.app', 'X-Title': 'SiJaga Sungai' } : {}),
+            },
             body: JSON.stringify({
-              model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+              model: provider.model,
               messages: [{ role: 'user', content: promptText }],
               response_format: { type: 'json_object' },
               temperature: 0.1,
@@ -198,9 +202,12 @@ class GeminiService {
             }),
           });
           if (res.status === 429) throw new Error('429: rate limited');
-          if (!res.ok) { const t = await res.text(); throw new Error(`Groq ${res.status}: ${t}`); }
+          if (!res.ok) { const t = await res.text(); throw new Error(`${provider.name} ${res.status}: ${t}`); }
           const data = await res.json();
-          return data.choices?.[0]?.message?.content || '';
+          const text = data.choices?.[0]?.message?.content;
+          if (!text) throw new Error(`Empty response from ${provider.name}`);
+          console.log(`[Gemini fallback] Used ${provider.name} (key ...${apiKey.slice(-6)})`);
+          return text;
         });
         // Return a Gemini-compatible response shape
         return { text } as any;

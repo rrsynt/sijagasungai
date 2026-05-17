@@ -13,8 +13,14 @@ function parseKeys(multiEnv: string, singleEnv: string): string[] {
 }
 
 const geminiKeys = parseKeys('GEMINI_API_KEYS', 'GEMINI_API_KEY');
-const groqKeys   = parseKeys('GROQ_API_KEYS',   'GROQ_API_KEY');
 let geminiIdx = 0;
+
+interface OAIProvider { name: string; baseUrl: string; keys: string[]; model: string; extraHeaders?: Record<string, string>; }
+const oaiProviders: OAIProvider[] = [
+  { name: 'Groq',       baseUrl: 'https://api.groq.com/openai/v1',  keys: parseKeys('GROQ_API_KEYS', 'GROQ_API_KEY'),             model: 'meta-llama/llama-4-scout-17b-16e-instruct' },
+  { name: 'OpenRouter', baseUrl: 'https://openrouter.ai/api/v1',    keys: parseKeys('OPENROUTER_API_KEYS', 'OPENROUTER_API_KEY'), model: 'google/gemini-2.0-flash-exp:free', extraHeaders: { 'HTTP-Referer': 'https://sijaga-sungai.app', 'X-Title': 'SiJaga Sungai' } },
+  { name: 'Hyperbolic', baseUrl: 'https://api.hyperbolic.xyz/v1',   keys: parseKeys('HYPERBOLIC_API_KEYS', 'HYPERBOLIC_API_KEY'), model: 'meta-llama/Llama-3.3-70B-Instruct' },
+].filter(p => p.keys.length > 0);
 
 function nextGeminiKey(): string | null {
   if (geminiKeys.length === 0) return null;
@@ -84,8 +90,8 @@ async function callGemini(contents: ReturnType<typeof buildContents>): Promise<s
   return response.text ?? '';
 }
 
-async function callGroq(history: ChatMessage[], message: string): Promise<string> {
-  if (groqKeys.length === 0) throw new Error('NO_GROQ_KEY');
+async function callFallbackChain(history: ChatMessage[], message: string): Promise<string> {
+  if (oaiProviders.length === 0) throw new Error('NO_FALLBACK_PROVIDER');
 
   const messages = [
     { role: 'system', content: SYSTEM_INSTRUCTION },
@@ -99,28 +105,33 @@ async function callGroq(history: ChatMessage[], message: string): Promise<string
     { role: 'user', content: message },
   ];
 
-  let lastErr: unknown;
-  for (const key of groqKeys) {
-    try {
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-          messages,
-          temperature: 0.7,
-          max_tokens: 512,
-        }),
-      });
-      if (res.status === 429) { lastErr = new Error('Groq 429'); continue; }
-      if (!res.ok) { const t = await res.text(); throw new Error(`Groq ${res.status}: ${t}`); }
-      const data = await res.json();
-      return data.choices?.[0]?.message?.content ?? '';
-    } catch (e) {
-      lastErr = e;
+  for (const provider of oaiProviders) {
+    let allExhausted = true;
+    for (const key of provider.keys) {
+      try {
+        const res = await fetch(`${provider.baseUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json',
+            ...provider.extraHeaders,
+          },
+          body: JSON.stringify({ model: provider.model, messages, temperature: 0.7, max_tokens: 512 }),
+        });
+        if (res.status === 429) continue;
+        if (!res.ok) { const t = await res.text(); throw new Error(`${provider.name} ${res.status}: ${t}`); }
+        const data = await res.json();
+        const text = data.choices?.[0]?.message?.content;
+        if (!text) throw new Error(`Empty response from ${provider.name}`);
+        console.log(`[Chat] Fallback via ${provider.name}`);
+        return text;
+      } catch (e: any) {
+        if (!String(e?.message).includes('429')) { allExhausted = false; throw e; }
+      }
     }
+    if (allExhausted) console.warn(`[Chat] ${provider.name} all keys rate-limited — trying next provider`);
   }
-  throw lastErr ?? new Error('All Groq keys failed');
+  throw new Error('All fallback providers exhausted');
 }
 
 export async function POST(req: Request) {
@@ -150,8 +161,8 @@ export async function POST(req: Request) {
       const is429 = geminiErr?.status === 429 || String(geminiErr?.message).includes('429') ||
         String(geminiErr?.message).includes('RESOURCE_EXHAUSTED') || geminiErr?.message === 'NO_GEMINI_KEY';
       if (is429 || geminiErr?.message === 'NO_GEMINI_KEY') {
-        console.warn('[Chat] Gemini quota/unavailable — falling back to Groq');
-        text = await callGroq(history, message);
+        console.warn('[Chat] Gemini quota/unavailable — falling back to provider chain');
+        text = await callFallbackChain(history, message);
       } else {
         throw geminiErr;
       }
