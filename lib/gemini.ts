@@ -88,15 +88,18 @@ class KeyPool {
       try {
         return await fn(key);
       } catch (err: any) {
-        const is429 = err?.status === 429 || String(err?.message).includes('429') ||
-          String(err?.message).includes('RESOURCE_EXHAUSTED') ||
-          String(err?.message).includes('rate_limit') ||
-          String(err?.message).includes('quota');
-        if (is429) {
-          this.markExhausted(key);
-          continue; // try next key
+        const msg = String(err?.message ?? '');
+        const isDaily = msg.includes('RESOURCE_EXHAUSTED') || msg.includes('quota') || msg.includes('exceeded your current quota');
+        const isRpm   = err?.status === 429 || msg.includes('429') || msg.includes('rate_limit') || msg.includes('rate-limit');
+        if (isDaily) {
+          this.markExhausted(key, 3_600_000); // 1 hour — daily quota
+          continue;
         }
-        throw err; // non-rate-limit error — propagate
+        if (isRpm) {
+          this.markExhausted(key, 90_000); // 90s — RPM limit
+          continue;
+        }
+        throw err; // non-rate-limit error — propagate immediately
       }
     }
     throw new Error('All API keys exhausted or rate-limited. Try again in a minute.');
@@ -164,7 +167,8 @@ const fallbackChain = new ProviderChain([
 // ─────────────────────────────────────────────────────────────────────────────
 
 class GeminiService {
-  private readonly defaultModel = "gemini-2.0-flash-lite";
+  private readonly defaultModel  = "gemini-2.0-flash-lite";
+  private readonly fallbackModel = "gemini-2.0-flash"; // separate quota tier
 
   constructor() {
     if (geminiPool.size === 0) {
@@ -275,56 +279,64 @@ ATURAN KETAT:
 
       const response = await geminiPool.tryAll(async (apiKey) => {
         const ai = new GoogleGenAI({ apiKey });
-        return ai.models.generateContent({
-          model: this.defaultModel,
-          contents: {
-            parts: [
-               { inlineData: { mimeType, data: imageBase64 } },
-               { text: prompt }
-            ]
-          },
-          config: {
-            systemInstruction: SIJAGA_SYSTEM_PROMPT,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                namaLokal: { type: Type.STRING },
-                namaIlmiah: { type: Type.STRING },
-                namaEn: { type: Type.STRING },
-                tingkatKeyakinan: { type: Type.STRING },
-                isInvasif: { type: Type.BOOLEAN },
-                statusInvasif: { type: Type.STRING },
-                alasanInvasif: { type: Type.STRING },
-                asalNegara: { type: Type.STRING },
-                estimasiUkuran: {
+        // Try primary model first, then fallback model on same key
+        for (const model of [this.defaultModel, this.fallbackModel]) {
+          try {
+            return await ai.models.generateContent({
+              model,
+              contents: {
+                parts: [
+                  { inlineData: { mimeType, data: imageBase64 } },
+                  { text: prompt }
+                ]
+              },
+              config: {
+                systemInstruction: SIJAGA_SYSTEM_PROMPT,
+                responseMimeType: "application/json",
+                responseSchema: {
                   type: Type.OBJECT,
                   properties: {
-                    panjangCm: { type: Type.NUMBER, nullable: true },
-                    beratGram: { type: Type.NUMBER, nullable: true },
-                    catatan: { type: Type.STRING }
+                    namaLokal: { type: Type.STRING },
+                    namaIlmiah: { type: Type.STRING },
+                    namaEn: { type: Type.STRING },
+                    tingkatKeyakinan: { type: Type.STRING },
+                    isInvasif: { type: Type.BOOLEAN },
+                    statusInvasif: { type: Type.STRING },
+                    alasanInvasif: { type: Type.STRING },
+                    asalNegara: { type: Type.STRING },
+                    estimasiUkuran: {
+                      type: Type.OBJECT,
+                      properties: {
+                        panjangCm: { type: Type.NUMBER, nullable: true },
+                        beratGram: { type: Type.NUMBER, nullable: true },
+                        catatan: { type: Type.STRING }
+                      },
+                      required: ["catatan"]
+                    },
+                    dampakEkologi: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    rekomendasiAksi: { type: Type.STRING },
+                    urgensiLaporan: { type: Type.STRING },
+                    penjelasanSiJaga: { type: Type.STRING },
+                    fotoKurangJelas: { type: Type.BOOLEAN },
+                    panduanFotoUlang: { type: Type.STRING, nullable: true }
                   },
-                  required: ["catatan"]
-                },
-                dampakEkologi: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING }
-                },
-                rekomendasiAksi: { type: Type.STRING },
-                urgensiLaporan: { type: Type.STRING },
-                penjelasanSiJaga: { type: Type.STRING },
-                fotoKurangJelas: { type: Type.BOOLEAN },
-                panduanFotoUlang: { type: Type.STRING, nullable: true }
-              },
-              required: [
-                "namaLokal", "namaIlmiah", "namaEn", "tingkatKeyakinan", "isInvasif",
-                "statusInvasif", "alasanInvasif", "asalNegara", "estimasiUkuran",
-                "dampakEkologi", "rekomendasiAksi", "urgensiLaporan", "penjelasanSiJaga",
-                "fotoKurangJelas"
-              ]
-            }
+                  required: [
+                    "namaLokal", "namaIlmiah", "namaEn", "tingkatKeyakinan", "isInvasif",
+                    "statusInvasif", "alasanInvasif", "asalNegara", "estimasiUkuran",
+                    "dampakEkologi", "rekomendasiAksi", "urgensiLaporan", "penjelasanSiJaga",
+                    "fotoKurangJelas"
+                  ]
+                }
+              }
+            });
+          } catch (modelErr: any) {
+            // Only re-throw if it's NOT a model-not-found/quota error — let outer tryAll handle quota
+            const msg = String(modelErr?.message ?? '');
+            if (!msg.includes('RESOURCE_EXHAUSTED') && !msg.includes('quota') && !msg.includes('429')) throw modelErr;
+            if (model === this.fallbackModel) throw modelErr; // exhausted both models on this key
           }
-        });
+        }
+        throw new Error('Both models exhausted for this key');
       });
 
       return this.parseJsonResponse<any>(response.text || "");
