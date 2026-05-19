@@ -13,9 +13,41 @@ const containerStyle = {
 };
 
 const center = {
-  lat: -2.5489, // Indonesia center
+  lat: -2.5489,
   lng: 118.0149
 };
+
+// Fish SVG marker icon generator — color-coded by invasive status
+function createFishMarkerIcon(status: string): google.maps.Icon {
+  const configs: Record<string, { fill: string; stroke: string; size: number }> = {
+    DARURAT: { fill: '#7F1D1D', stroke: '#FCA5A5', size: 44 },
+    KRITIS:  { fill: '#DC2626', stroke: '#FECACA', size: 38 },
+    TINGGI:  { fill: '#EA580C', stroke: '#FED7AA', size: 34 },
+    SEDANG:  { fill: '#D97706', stroke: '#FDE68A', size: 30 },
+    RENDAH:  { fill: '#16A34A', stroke: '#BBF7D0', size: 28 },
+  };
+  const cfg = configs[status] ?? { fill: '#0D9488', stroke: '#99F6E4', size: 28 };
+  const s = cfg.size;
+  // Proportional fish SVG viewBox 0 0 48 32
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 32" width="${s}" height="${Math.round(s * 0.67)}">
+    <!-- Tail -->
+    <polygon points="38,16 48,6 48,26" fill="${cfg.fill}" opacity="0.85"/>
+    <!-- Body -->
+    <ellipse cx="20" cy="16" rx="18" ry="11" fill="${cfg.fill}" stroke="${cfg.stroke}" stroke-width="2"/>
+    <!-- Fin top -->
+    <path d="M14,5 Q20,0 26,7" fill="none" stroke="${cfg.stroke}" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Eye -->
+    <circle cx="7" cy="13" r="3.5" fill="white"/>
+    <circle cx="7" cy="13" r="1.8" fill="#1e293b"/>
+    <!-- Status dot (pulse for DARURAT) -->
+    <circle cx="20" cy="16" r="4" fill="white" opacity="0.25"/>
+  </svg>`;
+  return {
+    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    scaledSize: new google.maps.Size(s, Math.round(s * 0.67)),
+    anchor: new google.maps.Point(s / 2, Math.round(s * 0.67) / 2),
+  };
+}
 
 interface ReportFeature {
   type: 'Feature';
@@ -286,15 +318,7 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
                     position={{ lat: report.geometry.coordinates[1], lng: report.geometry.coordinates[0] }}
                     clusterer={clusterer}
                     onClick={() => setSelectedReport(report)}
-                    icon={{
-                      path: google.maps.SymbolPath.CIRCLE,
-                      fillColor: report.properties.invasiveStatus === 'KRITIS' || report.properties.invasiveStatus === 'DARURAT' ? '#DC2626' : 
-                                 report.properties.invasiveStatus === 'TINGGI' ? '#D97706' : '#059669',
-                      fillOpacity: 0.9,
-                      strokeWeight: 2,
-                      strokeColor: '#FFFFFF',
-                      scale: 8
-                    }}
+                    icon={createFishMarkerIcon(report.properties.invasiveStatus)}
                   />
                 ))}
               </>
