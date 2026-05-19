@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { MessageCircle, X, Send, Bot, User, GripVertical } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 
 interface Message {
@@ -19,6 +19,35 @@ export function Chatbot() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Draggable position — stored as offset from bottom-right corner
+  const [pos, setPos] = useState({ x: 24, y: 24 }); // right: 24px, bottom: 24px
+  const isDragging = useRef(false);
+  const dragStart = useRef({ mouseX: 0, mouseY: 0, posX: 0, posY: 0 });
+
+  const onDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    dragStart.current = { mouseX: e.clientX, mouseY: e.clientY, posX: pos.x, posY: pos.y };
+  }, [pos]);
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      const dx = dragStart.current.mouseX - e.clientX;
+      const dy = dragStart.current.mouseY - e.clientY;
+      const newX = Math.max(8, dragStart.current.posX + dx);
+      const newY = Math.max(8, dragStart.current.posY + dy);
+      setPos({ x: newX, y: newY });
+    };
+    const onMouseUp = () => { isDragging.current = false; };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -33,8 +62,6 @@ export function Chatbot() {
 
     const userMsg = input.trim();
     setInput('');
-    
-    // Add user message to UI immediately
     const newMessages: Message[] = [...messages, { role: 'user', parts: [{ text: userMsg }] }];
     setMessages(newMessages);
     setIsLoading(true);
@@ -43,19 +70,15 @@ export function Chatbot() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: userMsg, 
-          history: messages 
-        }),
+        body: JSON.stringify({ message: userMsg, history: messages }),
       });
-      
       const data = await res.json();
       if (data.success) {
         setMessages([...newMessages, { role: 'model', parts: [{ text: data.text }] }]);
       } else {
         setMessages([...newMessages, { role: 'model', parts: [{ text: 'Maaf, sistem saya sedang gangguan. Coba lagi nanti ya!' }] }]);
       }
-    } catch (error) {
+    } catch {
       setMessages([...newMessages, { role: 'model', parts: [{ text: 'Maaf, koneksi terputus. Cek internet kamu ya.' }] }]);
     } finally {
       setIsLoading(false);
@@ -67,7 +90,8 @@ export function Chatbot() {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 p-4 rounded-full shadow-2xl transition-all duration-300 z-50 flex items-center justify-center ${
+        style={{ right: pos.x, bottom: pos.y }}
+        className={`fixed p-4 rounded-full shadow-2xl transition-all duration-300 z-50 flex items-center justify-center ${
           isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100 bg-blue-600 hover:bg-blue-700 text-white hover:shadow-blue-500/50'
         }`}
         title={t('Tanya SiJaga', 'Ask SiJaga')}
@@ -78,24 +102,30 @@ export function Chatbot() {
       </button>
 
       {/* Chat Window */}
-      <div 
-        className={`fixed bottom-6 right-6 w-[350px] max-w-[calc(100vw-3rem)] h-[500px] max-h-[calc(100vh-6rem)] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden transition-all duration-300 z-50 origin-bottom-right ${
+      <div
+        style={{ right: pos.x, bottom: pos.y }}
+        className={`fixed w-[350px] max-w-[calc(100vw-3rem)] h-[500px] max-h-[calc(100vh-6rem)] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden transition-all duration-300 z-50 origin-bottom-right ${
           isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'
         }`}
       >
-        {/* Header */}
-        <div className="bg-blue-600 p-4 flex items-center justify-between text-white shrink-0">
+        {/* Header — drag handle */}
+        <div
+          className="bg-blue-600 p-4 flex items-center justify-between text-white shrink-0 cursor-grab active:cursor-grabbing select-none"
+          onMouseDown={onDragStart}
+        >
           <div className="flex items-center gap-3">
+            <GripVertical className="w-4 h-4 text-blue-300 shrink-0" />
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center border border-white/30 backdrop-blur-sm">
               <Bot className="w-6 h-6 text-white" />
             </div>
             <div>
               <h3 className="font-bold leading-tight">SiJaga AI</h3>
-              <p className="text-xs text-blue-200">Asisten Virtual Cerdas</p>
+              <p className="text-xs text-blue-200">Tahan & seret untuk pindah</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => setIsOpen(false)}
+            onMouseDown={e => e.stopPropagation()}
             className="p-2 hover:bg-white/20 rounded-full transition-colors"
             aria-label={t('Tutup Chatbot', 'Close Chatbot')}
           >
@@ -114,8 +144,8 @@ export function Chatbot() {
                   {msg.role === 'user' ? <User className="w-3.5 h-3.5 text-white" /> : <Bot className="w-3.5 h-3.5 text-white" />}
                 </div>
                 <div className={`p-3 rounded-2xl text-sm ${
-                  msg.role === 'user' 
-                    ? 'bg-amber-500 text-white rounded-br-sm' 
+                  msg.role === 'user'
+                    ? 'bg-amber-500 text-white rounded-br-sm'
                     : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm'
                 }`}>
                   <p className="whitespace-pre-wrap leading-relaxed">{msg.parts[0].text}</p>

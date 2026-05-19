@@ -247,11 +247,19 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
   };
 
   const mapOptions = useMemo(() => ({
-    mapId: '8f3e5fa640dfb6c6', // Use a modern map style if available, or just default
+    // No mapId — styles option only works without mapId
     disableDefaultUI: false,
     zoomControl: true,
     streetViewControl: false,
     mapTypeControl: false,
+    // Hide all default Google Maps POI icons so fish markers stand out clearly
+    styles: [
+      { featureType: 'poi',             stylers: [{ visibility: 'off' }] },
+      { featureType: 'poi.park',        stylers: [{ visibility: 'simplified' }] },
+      { featureType: 'transit',         stylers: [{ visibility: 'off' }] },
+      { featureType: 'transit.station', stylers: [{ visibility: 'off' }] },
+      { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+    ],
   }), []);
 
   if (!isLoaded || loading) {
