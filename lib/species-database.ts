@@ -237,7 +237,7 @@ export const SPECIES_DATABASE: Record<string, InvasiveSpecies> = {
     referensi: "Kementerian Kelautan dan Perikanan (KKP)",
     badgeName: "SiMarmer",
     badgeEmoji: "🟠",
-    imageUrl: "/images/species/red_devil.png",
+    imageUrl: "/images/species/oscar.png",
     funFact: "Oscar dikenal sebagai 'anjing dunia ikan' — mampu mengenali pemiliknya, belajar trik, dan bahkan meminta dibelai di akuarium."
   },
   "arapaima": {
@@ -255,7 +255,7 @@ export const SPECIES_DATABASE: Record<string, InvasiveSpecies> = {
     referensi: "Permen KP No. 19/2020",
     badgeName: "RaksasaAmazon",
     badgeEmoji: "🐉",
-    imageUrl: "/images/species/alligator_gar.png",
+    imageUrl: "/images/species/arapaima.png",
     funFact: "Arapaima adalah salah satu ikan air tawar terbesar di dunia. Mereka bernapas dengan paru-paru khusus dan HARUS muncul ke permukaan setiap 5-20 menit — ini yang membuat mereka mudah ditangkap secara ilegal."
   },
   "ikan-pelangi-invasif": {
