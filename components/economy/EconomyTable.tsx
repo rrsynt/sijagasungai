@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
 import { EconomyResult } from '@/lib/types';
-import { ChevronDown, ChevronUp, Check, PlayCircle, Clock, Wrench } from 'lucide-react';
+import { ChevronDown, ChevronUp, Check, PlayCircle, Clock, Wrench, RefreshCw, AlertTriangle } from 'lucide-react';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { trackEvent } from '@/lib/analytics';
 
@@ -22,19 +22,22 @@ function isNonHumanPathway(nama: string, proses: string): boolean {
 export function EconomyTable({ result, speciesId }: EconomyTableProps) {
   const { t, language } = useLanguage();
   const [openGuideIndex, setOpenGuideIndex] = useState<number | null>(null);
-  const [guides, setGuides] = useState<Record<number, any>>({});
+  const [guides, setGuides] = useState<Record<number, any | 'error'>>({});
   const [loadingGuide, setLoadingGuide] = useState<number | null>(null);
 
-  const fetchGuide = async (index: number, pathwayName: string) => {
-    if (openGuideIndex === index) {
+  const fetchGuide = async (index: number, pathwayName: string, forceRetry = false) => {
+    if (!forceRetry && openGuideIndex === index) {
       setOpenGuideIndex(null);
       return;
     }
 
     setOpenGuideIndex(index);
-    if (guides[index]) return;
+    if (guides[index] && guides[index] !== 'error' && !forceRetry) return;
 
     setLoadingGuide(index);
+    // Clear previous error on retry
+    if (forceRetry) setGuides(prev => { const n = {...prev}; delete n[index]; return n; });
+
     try {
       const res = await fetch('/api/economy/guide', {
         method: 'POST',
@@ -42,16 +45,57 @@ export function EconomyTable({ result, speciesId }: EconomyTableProps) {
         body: JSON.stringify({ speciesId, pathway: pathwayName, lang: language }),
       });
       const data = await res.json();
-      if (data.success) {
-        setGuides((prev) => ({ ...prev, [index]: data.data }));
+      if (data.success && data.data?.steps?.length > 0) {
+        setGuides(prev => ({ ...prev, [index]: data.data }));
         trackEvent('economy_guide_opened', { species: speciesId, pathway: pathwayName });
+      } else {
+        setGuides(prev => ({ ...prev, [index]: 'error' }));
       }
-    } catch (error) {
-      console.error('Failed to fetch guide', error);
+    } catch {
+      setGuides(prev => ({ ...prev, [index]: 'error' }));
     } finally {
       setLoadingGuide(null);
     }
   };
+
+  // --- Empty state: spesies dilarang / tidak ada jalur ekonomi ---
+  if (!result.jalurPemanfaatan || result.jalurPemanfaatan.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="border-l-4 border-red-600 bg-red-50 p-6">
+          <div className="flex items-start gap-4">
+            <AlertTriangle className="w-7 h-7 text-red-700 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-black text-red-900 uppercase tracking-widest mb-2">
+                {t('Spesies Ini Dilarang Diperjualbelikan', 'This Species Cannot Be Traded')}
+              </p>
+              <p className="text-sm text-red-800 leading-relaxed">
+                {result.rekomendasiTerbaik?.alasan || t(
+                  'Berdasarkan Permen KP No. 19/2020, spesies ini termasuk kategori berbahaya dan dilarang untuk dipelihara, diperdagangkan, atau dimanfaatkan secara komersial.',
+                  'Based on MKP Regulation No. 19/2020, this species is classified as dangerous and prohibited from being kept, traded, or commercially utilized.'
+                )}
+              </p>
+              {result.rekomendasiTerbaik?.langkahPertama && result.rekomendasiTerbaik.langkahPertama !== '-' && (
+                <div className="mt-4 flex items-start gap-3 pt-4 border-t border-red-200">
+                  <PlayCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                  <p className="text-sm font-semibold text-red-900">{result.rekomendasiTerbaik.langkahPertama}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <a
+          href="https://wa.me/628111262220"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-3 w-full py-4 px-6 bg-red-600 hover:bg-red-700 text-white font-black text-sm uppercase tracking-widest transition-colors"
+        >
+          📞 {t('Lapor ke KKP Hotline (0811-1262-220)', 'Report to KKP Hotline (0811-1262-220)')}
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -90,10 +134,10 @@ export function EconomyTable({ result, speciesId }: EconomyTableProps) {
           <tbody className="bg-white divide-y divide-gray-200">
             {result.jalurPemanfaatan.map((pathway, idx) => {
               const isBest = result.rekomendasiTerbaik && result.rekomendasiTerbaik.jalur.toLowerCase().includes(pathway.nama.toLowerCase());
-              const isRecommended = isBest || (idx === 0 && !result.rekomendasiTerbaik); // Fallback to first if no recommendation match strictly
+              const isRecommended = isBest || (idx === 0 && !result.rekomendasiTerbaik);
               return (
                 <React.Fragment key={idx}>
-                  <tr 
+                  <tr
                     className={`hover:bg-gray-50 transition-colors cursor-pointer ${isRecommended ? 'bg-primary-sunai/5 relative' : ''}`}
                     onClick={() => fetchGuide(idx, pathway.nama)}
                   >
@@ -136,7 +180,7 @@ export function EconomyTable({ result, speciesId }: EconomyTableProps) {
                        )}
                     </td>
                   </tr>
-                  
+
                   {/* Expanding Guide Accordion */}
                   {openGuideIndex === idx && (
                     <tr>
@@ -144,6 +188,18 @@ export function EconomyTable({ result, speciesId }: EconomyTableProps) {
                         <div className="px-6 py-6 border-b border-gray-200 animate-in slide-in-from-top-2">
                           {loadingGuide === idx ? (
                              <LoadingSpinner text={t('Memuat panduan...', 'Loading guide...')} />
+                          ) : guides[idx] === 'error' ? (
+                            <div className="flex items-center gap-4 text-red-600">
+                              <AlertTriangle className="w-5 h-5 shrink-0" />
+                              <span className="text-sm font-medium">{t('Gagal memuat panduan.', 'Failed to load guide.')}</span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); fetchGuide(idx, pathway.nama, true); }}
+                                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold border border-red-300 hover:bg-red-50 transition-colors rounded"
+                              >
+                                <RefreshCw className="w-3.5 h-3.5" />
+                                {t('Coba Lagi', 'Retry')}
+                              </button>
+                            </div>
                           ) : guides[idx] ? (
                             <div className="max-w-4xl space-y-6">
                               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -154,7 +210,7 @@ export function EconomyTable({ result, speciesId }: EconomyTableProps) {
                                   <span className="flex items-center"><Wrench className="w-4 h-4 mr-1"/> {guides[idx].difficulty}</span>
                                 </div>
                               </div>
-                              
+
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="md:col-span-2 space-y-4">
                                   <h5 className="font-semibold text-gray-800">{t('Langkah-Langkah', 'Steps')}</h5>
@@ -187,9 +243,7 @@ export function EconomyTable({ result, speciesId }: EconomyTableProps) {
                                 </div>
                               </div>
                             </div>
-                          ) : (
-                            <p className="text-red-500 text-sm">{t('Gagal memuat.', 'Failed to load.')}</p>
-                          )}
+                          ) : null}
                         </div>
                       </td>
                     </tr>
