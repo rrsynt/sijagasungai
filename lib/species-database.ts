@@ -209,7 +209,7 @@ export const SPECIES_DATABASE: Record<string, InvasiveSpecies> = {
     ciriIdentifikasi: ["Terdapat bulatan corak 'mata' (ocellus) palsu besar di pangkal ekor", "Warna dasar hijau atau emas kekuningan dengan garis vertikal (bar) tegas", "Mulut monyong lebar (bass-like)"],
     dampakEkologi: ["Pemangsa gerak cepat yang menyusutkan populasi ikan mas kecil atau pelagis lokal secara drastis", "Rakus dan kompetitor puncak di perairan pakan"],
     jalurEkonomi: {
-      konsumsi: { available: true, pricePerKg: 35000, process: "Fillet panggang tebal karena kualitas daging putihnya padat (game fish grade)", difficulty: 'MUDAH', timeRequired: "Langsung" },
+      konsumsi: { available: true, pricePerKg: 65000, process: "Fillet panggang tebal karena kualitas daging putihnya padat (game fish premium)", difficulty: 'MUDAH', timeRequired: "Langsung" },
       ikanhias: { available: true, pricePerKg: 75000, process: "Sport fishing bernilai tinggi, tangkap hidup untuk ke penghobi predator", difficulty: 'SULIT', timeRequired: "2-3 hari karantina anti jamur" }
     },
     urgensiLaporan: "TINGGI",
@@ -218,6 +218,45 @@ export const SPECIES_DATABASE: Record<string, InvasiveSpecies> = {
     badgeEmoji: "🦚",
     imageUrl: "/images/species/peacock_bass.png",
     funFact: "Cincin hitam menyerupai mata di bagian ekor (ocellus) berfungsi mengecoh predator atau mangsa agar menyerang bagian belakang tubuh alih-alih pelariannya."
+  },
+  "oscar": {
+    id: "oscar",
+    namaLokal: ["Oscar", "Ikan Oscar", "Velvet Cichlid", "Tiger Oscar"],
+    namaIlmiah: "Astronotus ocellatus",
+    namaEn: "Oscar Fish",
+    asal: "Amerika Selatan (Amazon)",
+    statusInvasif: "TINGGI",
+    ekosistemTerdampak: ["Sungai", "Waduk", "Danau", "Rawa perkotaan"],
+    ciriIdentifikasi: ["Tubuh oval besar dan padat", "Corak oranye atau merah seperti batu marmer/api di atas dasar hitam", "Bulatan 'mata palsu' oranye di pangkal ekor", "Mulut besar dengan bibir tebal"],
+    dampakEkologi: ["Predator oportunistik yang memangsa ikan-ikan kecil dan invertebrata", "Mengacaukan substrat dasar sungai saat mencari makan", "Menghambat regenerasi vegetasi tepi air"],
+    jalurEkonomi: {
+      konsumsi: { available: true, pricePerKg: 22000, process: "Digoreng kering atau dibakar bumbu, daging putih tebal dan gurih", difficulty: 'MUDAH', timeRequired: "Langsung" },
+      ikanhias: { available: true, pricePerKg: 40000, process: "Sortir berdasarkan warna dan ukuran, karantina 5-7 hari", difficulty: 'MUDAH', timeRequired: "5-7 hari" }
+    },
+    urgensiLaporan: "TINGGI",
+    referensi: "Kementerian Kelautan dan Perikanan (KKP)",
+    badgeName: "SiMarmer",
+    badgeEmoji: "🟠",
+    imageUrl: "/images/species/red_devil.png",
+    funFact: "Oscar dikenal sebagai 'anjing dunia ikan' — mampu mengenali pemiliknya, belajar trik, dan bahkan meminta dibelai di akuarium."
+  },
+  "arapaima": {
+    id: "arapaima",
+    namaLokal: ["Arapaima", "Pirarucu", "Ikan Raksasa Amazon"],
+    namaIlmiah: "Arapaima gigas",
+    namaEn: "Arapaima",
+    asal: "Amerika Selatan (Amazon)",
+    statusInvasif: "DARURAT",
+    ekosistemTerdampak: ["Sungai besar", "Danau", "Waduk berukuran besar"],
+    ciriIdentifikasi: ["Ukuran sangat besar, dapat mencapai 3 meter dan berat 200 kg", "Warna tubuh abu-abu kehijauan dengan sisik besar berwarna kemerahan di bagian belakang", "Kepala datar dan pipih mirip ular", "Harus muncul ke permukaan untuk menghirup udara secara berkala"],
+    dampakEkologi: ["Predator puncak yang mengancam seluruh ekosistem perairan", "Mampu menghabiskan populasi ikan berukuran sedang di area yang besar", "Tidak memiliki predator alami di perairan Indonesia"],
+    jalurEkonomi: {},
+    urgensiLaporan: "DARURAT",
+    referensi: "Permen KP No. 19/2020",
+    badgeName: "RaksasaAmazon",
+    badgeEmoji: "🐉",
+    imageUrl: "/images/species/alligator_gar.png",
+    funFact: "Arapaima adalah salah satu ikan air tawar terbesar di dunia. Mereka bernapas dengan paru-paru khusus dan HARUS muncul ke permukaan setiap 5-20 menit — ini yang membuat mereka mudah ditangkap secara ilegal."
   },
   "ikan-pelangi-invasif": {
     id: "ikan-pelangi-invasif",
