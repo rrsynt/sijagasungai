@@ -750,23 +750,48 @@ ATURAN:
 
     } catch (error) {
       console.error("Error in generateEducationCard:", error);
+      // Use static species data — never show "Ikan Misterius" garbage to user
+      const speciesData = SPECIES_DATABASE[speciesId];
+      if (speciesData) {
+        const statusMap: Record<string, string> = {
+          DARURAT: 'INVASIF KRITIS', KRITIS: 'INVASIF KRITIS',
+          TINGGI: 'INVASIF TINGGI', SEDANG: 'INVASIF SEDANG', RENDAH: 'TIDAK INVASIF'
+        };
+        return {
+          namaDisplay: speciesData.namaLokal[0],
+          statusBadge: statusMap[speciesData.statusInvasif] ?? 'INVASIF SEDANG',
+          asalUsul: `${speciesData.namaLokal[0]} (${speciesData.namaIlmiah}) berasal dari ${speciesData.asal}. Spesies ini kini telah menyebar ke perairan Indonesia dan tercatat sebagai spesies invasif berstatus ${speciesData.statusInvasif} oleh ${speciesData.referensi}.`,
+          kekuatanSuper: speciesData.dampakEkologi.map(d => ({ nama: 'Ancaman Ekologi', penjelasan: d })),
+          rantaiDampak: [
+            `${speciesData.namaLokal[0]} dilepas ke perairan lokal`,
+            `Populasi berkembang pesat tanpa predator alami`,
+            `Bersaing dengan ikan endemik untuk makanan dan habitat`,
+            `Ekosistem sungai terganggu, keanekaragaman hayati menurun`,
+          ],
+          faktaMengejutkan: speciesData.funFact,
+          predatorAlami: `Di habitat aslinya (${speciesData.asal}), spesies ini memiliki predator alami. Namun di perairan Indonesia, tidak ada predator alami yang efektif mengendalikan populasinya — inilah yang membuatnya sulit dikendalikan.`,
+          badge: { nama: speciesData.badgeName, deskripsi: `Status invasif: ${speciesData.statusInvasif}`, emoji: speciesData.badgeEmoji },
+          kuis: [
+            {
+              soal: `Dari mana asal ${speciesData.namaLokal[0]}?`,
+              opsi: { A: speciesData.asal, B: 'Afrika', C: 'Australia', D: 'Eropa' },
+              jawaban: 'A',
+              penjelasan: `${speciesData.namaLokal[0]} memang berasal dari ${speciesData.asal}, bukan spesies asli Indonesia.`,
+              tingkat: 'MUDAH'
+            }
+          ],
+        };
+      }
       return {
-        namaDisplay: "Ikan Misterius",
+        namaDisplay: "Spesies Invasif",
         statusBadge: "INVASIF SEDANG",
-        asalUsul: "Terjadi kesalahan saat memuat kartu edukasi.",
-        kekuatanSuper: [{ nama: "Error", penjelasan: "Gagal memuat data AI." }],
-        rantaiDampak: ["A", "B", "C", "D"],
-        faktaMengejutkan: "Sistem AI sedang sibuk.",
-        badge: { nama: "Perintis", deskripsi: "Gagal memuat", emoji: "😢" },
-        kuis: [
-          {
-            soal: "Apa yang terjadi?",
-            opsi: { A: "Error AI", B: "Network", C: "Semua Benar", D: "Salah" },
-            jawaban: "C",
-            penjelasan: "Kesalahan internal.",
-            tingkat: "MUDAH"
-          }
-        ]
+        asalUsul: "Data sedang dimuat. Silakan coba lagi.",
+        kekuatanSuper: [{ nama: "Info", penjelasan: "Data tersedia di halaman edukasi." }],
+        rantaiDampak: ["Spesies masuk ke ekosistem", "Populasi berkembang", "Ikan lokal terancam", "Ekosistem terganggu"],
+        faktaMengejutkan: "Ikan invasif adalah ancaman nyata bagi keanekaragaman hayati Indonesia.",
+        predatorAlami: "Informasi sedang dimuat.",
+        badge: { nama: "Invasif", deskripsi: "Spesies invasif", emoji: "🐟" },
+        kuis: [],
       };
     }
   }
