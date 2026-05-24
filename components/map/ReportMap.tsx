@@ -384,11 +384,11 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
             className="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white text-gray-700 focus:outline-none focus:border-blue-400 cursor-pointer"
           >
             <option value="ALL">{t('Semua Status', 'All Status')}</option>
-            <option value="DARURAT">🆘 DARURAT</option>
-            <option value="KRITIS">🔴 KRITIS</option>
-            <option value="TINGGI">🟠 TINGGI</option>
-            <option value="SEDANG">🟡 SEDANG</option>
-            <option value="RENDAH">🟢 RENDAH</option>
+            <option value="DARURAT">🆘 {t('DARURAT', 'EMERGENCY')}</option>
+            <option value="KRITIS">🔴 {t('KRITIS', 'CRITICAL')}</option>
+            <option value="TINGGI">🟠 {t('TINGGI', 'HIGH')}</option>
+            <option value="SEDANG">🟡 {t('SEDANG', 'MEDIUM')}</option>
+            <option value="RENDAH">🟢 {t('RENDAH', 'LOW')}</option>
           </select>
           <select
             value={filterSpecies}

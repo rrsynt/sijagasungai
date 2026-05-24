@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../LanguageContext';
 
 type BadgeProps = {
   status: 'KRITIS' | 'TINGGI' | 'SEDANG' | 'RENDAH' | 'DARURAT' | 'TIDAK INVASIF' | string;
@@ -6,6 +7,8 @@ type BadgeProps = {
 };
 
 export function Badge({ status, className = '' }: BadgeProps) {
+  const { t } = useLanguage();
+
   const getBadgeStyle = () => {
     switch (status) {
       case 'DARURAT':
@@ -24,9 +27,28 @@ export function Badge({ status, className = '' }: BadgeProps) {
     }
   };
 
+  const getTranslatedStatus = () => {
+    switch (status) {
+      case 'DARURAT':
+        return t('DARURAT', 'EMERGENCY');
+      case 'KRITIS':
+        return t('KRITIS', 'CRITICAL');
+      case 'TINGGI':
+        return t('TINGGI', 'HIGH');
+      case 'SEDANG':
+        return t('SEDANG', 'MEDIUM');
+      case 'RENDAH':
+        return t('RENDAH', 'LOW');
+      case 'TIDAK INVASIF':
+        return t('TIDAK INVASIF', 'NON-INVASIVE');
+      default:
+        return status;
+    }
+  };
+
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${getBadgeStyle()} ${className}`}>
-      {status}
+      {getTranslatedStatus()}
     </span>
   );
 }
