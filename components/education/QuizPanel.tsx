@@ -15,9 +15,10 @@ interface QuizQuestion {
 
 interface QuizPanelProps {
   speciesId: string;
+  onFinish?: (badge: string) => void;
 }
 
-export function QuizPanel({ speciesId }: QuizPanelProps) {
+export function QuizPanel({ speciesId, onFinish }: QuizPanelProps) {
   const { t, language } = useLanguage();
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,6 +44,13 @@ export function QuizPanel({ speciesId }: QuizPanelProps) {
     }
     fetchQuiz();
   }, [speciesId, language]);
+
+  useEffect(() => {
+    if (finished && onFinish) {
+      const badgeTitle = score === questions.length ? t('Pakar', 'Expert') : t('Pengamat', 'Observer');
+      onFinish(`${badgeTitle} (${speciesId})`);
+    }
+  }, [finished, score, questions.length, speciesId, onFinish, t]);
 
   if (loading) {
     return <div className="py-12"><LoadingSpinner text={t('Menyiapkan kuis...', 'Preparing quiz...')} /></div>;
