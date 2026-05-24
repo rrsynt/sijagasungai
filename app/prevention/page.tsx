@@ -82,6 +82,51 @@ export default function PreventionPage() {
         </p>
       </section>
 
+      {/* DECISION FLOWCHART SECTION */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+        <div className="border-2 border-gray-900 bg-white p-8 md:p-12 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100 rounded-full blur-2xl -z-10 opacity-60"></div>
+          <h2 className="text-2xl font-black uppercase tracking-wider mb-8 text-center">
+            {t('Alur Aksi SiJaga Sungai (Flowchart)', 'SiJaga Sungai Action Flowchart')}
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            {/* Step 1 */}
+            <div className="flex flex-col items-center text-center p-6 border-2 border-dashed border-gray-300 relative bg-white">
+              <div className="w-12 h-12 bg-gray-900 text-white font-black flex items-center justify-center text-lg mb-4 rounded-full">1</div>
+              <h3 className="text-lg font-black uppercase tracking-wide mb-2">{t('Pindai Spesies (AI)', 'Scan Species (AI)')}</h3>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                {t('Upload foto di menu Identifikasi. AI mendeteksi spesies & status invasif.', 'Upload a photo in the Identify menu. AI detects species & invasive status.')}
+              </p>
+              {/* Arrow right for md+, down for mobile */}
+              <div className="hidden md:block absolute -right-6 top-1/2 -translate-y-1/2 z-10 text-gray-400 font-bold text-xl">→</div>
+              <div className="block md:hidden absolute -bottom-6 left-1/2 -translate-x-1/2 z-10 text-gray-400 font-bold text-xl">↓</div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="flex flex-col items-center text-center p-6 border-2 border-dashed border-gray-300 relative bg-white">
+              <div className="w-12 h-12 bg-gray-900 text-white font-black flex items-center justify-center text-lg mb-4 rounded-full">2</div>
+              <h3 className="text-lg font-black uppercase tracking-wide mb-2">{t('Ambil Tindakan', 'Take Action')}</h3>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                {t('Jika Invasif: JANGAN dilepas. Jika Aman: Boleh dilepas / konsumsi.', 'If Invasive: DO NOT release. If Safe: Can be released or consumed.')}
+              </p>
+              {/* Arrow right for md+, down for mobile */}
+              <div className="hidden md:block absolute -right-6 top-1/2 -translate-y-1/2 z-10 text-gray-400 font-bold text-xl">→</div>
+              <div className="block md:hidden absolute -bottom-6 left-1/2 -translate-x-1/2 z-10 text-gray-400 font-bold text-xl">↓</div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="flex flex-col items-center text-center p-6 border-2 border-dashed border-gray-300 bg-white">
+              <div className="w-12 h-12 bg-gray-900 text-white font-black flex items-center justify-center text-lg mb-4 rounded-full">3</div>
+              <h3 className="text-lg font-black uppercase tracking-wide mb-2">{t('Petakan Tangkapan', 'Map the Catch')}</h3>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                {t('Kirim laporan ke peta nasional untuk melacak dampak ekologi.', 'Submit the report to the national map to track ecological impacts.')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-16">
         
         {/* Left Column - Actions */}
