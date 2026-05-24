@@ -142,9 +142,21 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showDemo, setShowDemo] = useState(false);
 
+  const [filterStatus, setFilterStatus] = useState<string>('ALL');
+  const [filterSpecies, setFilterSpecies] = useState<string>('ALL');
+
+  const allSpeciesNames = useMemo(() => {
+    const names = new Set<string>();
+    [...reports, ...DEMO_REPORTS].forEach(r => names.add(r.properties.speciesName.split(' (')[0].trim()));
+    return Array.from(names).sort();
+  }, [reports]);
+
   const displayedReports = useMemo(() => {
-    return showDemo ? [...reports, ...DEMO_REPORTS] : reports;
-  }, [showDemo, reports]);
+    let base = showDemo ? [...reports, ...DEMO_REPORTS] : reports;
+    if (filterStatus !== 'ALL') base = base.filter(r => r.properties.invasiveStatus === filterStatus);
+    if (filterSpecies !== 'ALL') base = base.filter(r => r.properties.speciesName.startsWith(filterSpecies));
+    return base;
+  }, [showDemo, reports, filterStatus, filterSpecies]);
 
   useEffect(() => {
     async function fetchMapData() {
@@ -329,39 +341,69 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
 
   return (
     <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-sm border border-gray-200">
-      <div className="absolute top-4 left-4 z-10 bg-white p-2 rounded-xl shadow-lg border border-gray-100 flex items-center space-x-2">
-        <button 
-          onClick={() => setShowHeatmap(false)}
-          className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${!showHeatmap ? 'bg-primary-sunai text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-        >
-          📍 {t('Titik Laporan', 'Report Points')}
-        </button>
-        <button 
-          onClick={() => setShowHeatmap(true)}
-          className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${showHeatmap ? 'bg-red-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-        >
-          🔥 {t('Zona Merah', 'Red Zone')}
-        </button>
-        <div className="w-px h-6 bg-gray-200" />
-        <button
-          onClick={() => setShowDemo(d => !d)}
-          className={`px-4 py-2 text-sm font-bold rounded-lg transition-all border ${
-            showDemo
-              ? 'bg-violet-600 text-white border-violet-600 shadow-md shadow-violet-200'
-              : 'bg-white text-violet-600 border-violet-300 hover:bg-violet-50'
-          }`}
-          title={t('Tampilkan 30 laporan demo untuk presentasi', 'Show 30 demo reports for presentation')}
-        >
-          {showDemo ? `✓ Demo ON (${DEMO_REPORTS.length})` : '🧪 Demo Data'}
-        </button>
-        <div className="w-px h-6 bg-gray-200" />
-        <button
-          onClick={exportToCSV}
-          className="px-4 py-2 text-sm font-bold rounded-lg transition-colors bg-white text-emerald-700 border border-emerald-300 hover:bg-emerald-50 hover:border-emerald-400 flex items-center"
-          title={t('Unduh data CSV untuk penelitian', 'Download CSV data for research')}
-        >
-          ⬇️ {t('Unduh CSV', 'Export CSV')}
-        </button>
+      <div className="absolute top-4 left-4 z-10 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+        {/* Row 1: View toggle */}
+        <div className="flex items-center gap-1 p-2 border-b border-gray-100">
+          <button 
+            onClick={() => setShowHeatmap(false)}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${!showHeatmap ? 'bg-primary-sunai text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            📍 {t('Titik', 'Points')}
+          </button>
+          <button 
+            onClick={() => setShowHeatmap(true)}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${showHeatmap ? 'bg-red-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            🔥 {t('Zona Merah', 'Heat Zone')}
+          </button>
+          <div className="w-px h-5 bg-gray-200" />
+          <button
+            onClick={() => setShowDemo(d => !d)}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all border ${
+              showDemo
+                ? 'bg-violet-600 text-white border-violet-600'
+                : 'bg-white text-violet-600 border-violet-300 hover:bg-violet-50'
+            }`}
+            title={t('Tampilkan laporan demo untuk presentasi', 'Show demo reports for presentation')}
+          >
+            {showDemo ? `✓ Demo` : '🧪 Demo'}
+          </button>
+          <div className="w-px h-5 bg-gray-200" />
+          <button
+            onClick={exportToCSV}
+            className="px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-emerald-700 border border-emerald-200 hover:bg-emerald-50"
+          >
+            ⬇️ CSV
+          </button>
+        </div>
+        {/* Row 2: Filters + count */}
+        <div className="flex items-center gap-2 px-2 py-1.5 bg-gray-50">
+          <select
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value)}
+            className="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white text-gray-700 focus:outline-none focus:border-blue-400 cursor-pointer"
+          >
+            <option value="ALL">{t('Semua Status', 'All Status')}</option>
+            <option value="DARURAT">🆘 DARURAT</option>
+            <option value="KRITIS">🔴 KRITIS</option>
+            <option value="TINGGI">🟠 TINGGI</option>
+            <option value="SEDANG">🟡 SEDANG</option>
+            <option value="RENDAH">🟢 RENDAH</option>
+          </select>
+          <select
+            value={filterSpecies}
+            onChange={e => setFilterSpecies(e.target.value)}
+            className="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white text-gray-700 focus:outline-none focus:border-blue-400 cursor-pointer max-w-[140px]"
+          >
+            <option value="ALL">{t('Semua Spesies', 'All Species')}</option>
+            {allSpeciesNames.map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+          <span className="text-xs font-bold text-gray-500 whitespace-nowrap">
+            {displayedReports.length} {t('titik', 'pts')}
+          </span>
+        </div>
       </div>
       {showDemo && (
         <div className="absolute bottom-4 left-4 z-10 bg-violet-600/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-lg shadow-lg">
