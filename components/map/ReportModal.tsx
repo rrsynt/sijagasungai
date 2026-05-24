@@ -529,10 +529,9 @@ export function ReportModal({ onClose, onSuccess, initialSpeciesName }: ReportMo
                         justifyContent: 'space-between',
                         position: 'relative'
                       }}
-                    >
-                      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, color: '#ffffff', gap: '1.5rem' }}>
+                                 <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, color: '#ffffff', gap: '1.5rem' }}>
                         <div style={{ backgroundColor: 'rgba(255,255,255,0.2)', padding: '0.75rem 2rem', borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.3)', letterSpacing: '0.2em', fontWeight: 900, fontSize: '1.25rem', color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase', marginBottom: '1rem' }}>
-                          BUKTI LAPORAN SIJAGA SUNGAI
+                          {t('BUKTI LAPORAN SIJAGA SUNGAI', 'SIJAGA SUNGAI REPORT RECEIPT')}
                         </div>
                         
                         <div style={{ width: '16rem', height: '16rem', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '2.5rem', border: '4px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '120px', position: 'relative', overflow: 'hidden' }}>
@@ -553,26 +552,32 @@ export function ReportModal({ onClose, onSuccess, initialSpeciesName }: ReportMo
                           </h1>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.875rem', fontWeight: 500, color: 'rgba(255,255,255,0.8)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '0.75rem 1.5rem', borderRadius: '1rem', marginTop: '0.5rem' }}>
                             <MapPin style={{ width: '2rem', height: '2rem', marginRight: '0.75rem', color: '#ffffff' }} />
-                            {locationName || 'Lokasi Tersembunyi'}
+                            {locationName || t('Lokasi Tersembunyi', 'Hidden Location')}
                           </div>
                         </div>
 
                         <div style={{ width: '100%', maxWidth: '56rem', display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '2rem', marginTop: '1.5rem' }}>
                           <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '4px solid rgba(255,255,255,0.2)', padding: '1.5rem', borderRadius: '2rem' }}>
-                            <p style={{ fontSize: '1.5rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.25rem', margin: 0 }}>Tingkat Urgensi</p>
-                            <p style={{ fontSize: '3rem', fontWeight: 900, margin: 0 }}>{generatedReport?.laporanResmi?.urgensi}</p>
+                            <p style={{ fontSize: '1.5rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.25rem', margin: 0 }}>{t('Tingkat Urgensi', 'Urgency Level')}</p>
+                            <p style={{ fontSize: '3rem', fontWeight: 900, margin: 0 }}>
+                              {generatedReport?.laporanResmi?.urgensi === 'DARURAT' ? t('DARURAT', 'EMERGENCY') :
+                               generatedReport?.laporanResmi?.urgensi === 'KRITIS' ? t('KRITIS', 'CRITICAL') :
+                               generatedReport?.laporanResmi?.urgensi === 'TINGGI' ? t('TINGGI', 'HIGH') :
+                               generatedReport?.laporanResmi?.urgensi === 'SEDANG' ? t('SEDANG', 'MEDIUM') :
+                               generatedReport?.laporanResmi?.urgensi === 'RENDAH' ? t('RENDAH', 'LOW') : generatedReport?.laporanResmi?.urgensi}
+                            </p>
                           </div>
                           <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '4px solid rgba(255,255,255,0.2)', padding: '1.5rem', borderRadius: '2rem' }}>
-                            <p style={{ fontSize: '1.5rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.25rem', margin: 0 }}>Jumlah</p>
-                            <p style={{ fontSize: '3rem', fontWeight: 900, margin: 0 }}>{quantity} Ekor</p>
+                            <p style={{ fontSize: '1.5rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.25rem', margin: 0 }}>{t('Jumlah', 'Quantity')}</p>
+                            <p style={{ fontSize: '3rem', fontWeight: 900, margin: 0 }}>{quantity} {t('Ekor', 'Specimens')}</p>
                           </div>
                         </div>
                         
                         <div style={{ backgroundColor: 'rgba(0,0,0,0.2)', padding: '1.5rem 2rem', borderRadius: '1.5rem', border: '1px solid rgba(255,255,255,0.1)', marginTop: '1rem', maxWidth: '56rem', textAlign: 'center' }}>
                           <p style={{ fontSize: '1.875rem', color: '#ffffff', fontWeight: 900, fontStyle: 'italic', lineHeight: 1.5, margin: 0 }}>
                             {locationName 
-                              ? `"Saya melaporkan penemuan invasif ikan ${speciesName} di ${locationName}!"`
-                              : `"Saya melaporkan penemuan invasif ikan ${speciesName} ke Peta Nasional SiJaga Sungai!"`}
+                              ? t(`"Saya melaporkan penemuan invasif ikan ${speciesName} di ${locationName}!"`, `"I reported an invasive sighting of ${speciesName} fish at ${locationName}!"`)
+                              : t(`"Saya melaporkan penemuan invasif ikan ${speciesName} ke Peta Nasional SiJaga Sungai!"`, `"I reported an invasive sighting of ${speciesName} fish to the SiJaga Sungai National Map!"`)}
                           </p>
                         </div>
                       </div>
@@ -584,14 +589,14 @@ export function ReportModal({ onClose, onSuccess, initialSpeciesName }: ReportMo
                           </div>
                           <div>
                             <p style={{ fontSize: '1.5rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.025em', margin: 0 }}>SiJaga Sungai</p>
-                            <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.7)', fontWeight: 500, margin: 0 }}>Kenali. Laporkan. Manfaatkan.</p>
+                            <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.7)', fontWeight: 500, margin: 0 }}>{t('Kenali. Laporkan. Manfaatkan.', 'Identify. Report. Utilize.')}</p>
                           </div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          <p style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff', letterSpacing: '0.1em', opacity: 0.8, marginBottom: '0.25rem', margin: 0 }}>ID LAPORAN</p>
+                          <p style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff', letterSpacing: '0.1em', opacity: 0.8, marginBottom: '0.25rem', margin: 0 }}>{t('ID LAPORAN', 'REPORT ID')}</p>
                           <p style={{ fontSize: '1.5rem', fontFamily: 'monospace', fontWeight: 900, color: '#ffffff', margin: 0 }}>{generatedReport?.laporanResmi?.idLaporan}</p>
                         </div>
-                      </div>
+                      </div>           </div>
                     </div>
                   </div>
                 );

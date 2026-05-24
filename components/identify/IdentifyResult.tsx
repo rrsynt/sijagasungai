@@ -584,7 +584,7 @@ export function IdentifyResult({ result, speciesId, uploadedImage }: IdentifyRes
         >
           <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, color: '#ffffff', gap: '3rem' }}>
             <div style={{ backgroundColor: 'rgba(255,255,255,0.2)', padding: '0.75rem 2rem', borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.3)', letterSpacing: '0.2em', fontWeight: 900, fontSize: '1.25rem', color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase' }}>
-              LAPORAN SIJAGA SUNGAI
+              {t('LAPORAN SIJAGA SUNGAI', 'SIJAGA SUNGAI REPORT')}
             </div>
             
             {/* Foto yang diunggah pengguna atau fallback ke foto database */}
@@ -594,7 +594,7 @@ export function IdentifyResult({ result, speciesId, uploadedImage }: IdentifyRes
                 <img src={uploadedImage} alt="Foto Temuan" className="w-full h-full object-cover" />
               ) : speciesData?.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={speciesData.imageUrl} alt={result.namaLokal} className="w-full h-full object-cover" />
+                <img src={speciesData.imageUrl} alt={result.namaLokal[0]} className="w-full h-full object-cover" />
               ) : (
                 <div className="drop-shadow-2xl">{speciesData?.badgeEmoji || '🐟'}</div>
               )}
@@ -624,31 +624,41 @@ export function IdentifyResult({ result, speciesId, uploadedImage }: IdentifyRes
             }}>
               <AlertTriangle style={{ width: '4rem', height: '4rem' }} />
               <div>
-                <p style={{ fontSize: '1.5rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.25rem' }}>Status Bahaya</p>
-                <p style={{ fontSize: '3rem', fontWeight: 900, letterSpacing: '0.05em' }}>{result.statusInvasif}</p>
+                <p style={{ fontSize: '1.5rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.25rem' }}>{t('Status Bahaya', 'Threat Status')}</p>
+                <p style={{ fontSize: '3rem', fontWeight: 900, letterSpacing: '0.05em' }}>
+                  {result.statusInvasif === 'DARURAT' ? t('DARURAT', 'EMERGENCY') :
+                   result.statusInvasif === 'KRITIS' ? t('KRITIS', 'CRITICAL') :
+                   result.statusInvasif === 'TINGGI' ? t('TINGGI', 'HIGH') :
+                   result.statusInvasif === 'SEDANG' ? t('SEDANG', 'MEDIUM') :
+                   result.statusInvasif === 'RENDAH' ? t('RENDAH', 'LOW') :
+                   result.statusInvasif === 'TIDAK INVASIF' ? t('TIDAK INVASIF', 'NON-INVASIVE') : result.statusInvasif}
+                </p>
               </div>
             </div>
             
             {/* Teks Quotes Pelaporan */}
             <div style={{ backgroundColor: 'rgba(0,0,0,0.2)', padding: '2rem', borderRadius: '1.5rem', border: '1px solid rgba(255,255,255,0.1)', marginTop: '1.5rem', maxWidth: '48rem', textAlign: 'center' }}>
               <p style={{ fontSize: '1.875rem', color: '#ffffff', fontWeight: 900, fontStyle: 'italic', lineHeight: 1.625 }}>
-                &quot;Saya telah mengidentifikasi spesies invasif ini menggunakan AI SiJaga Sungai!&quot;
+                {t(
+                  `"Saya telah mengidentifikasi spesies invasif ini menggunakan AI SiJaga Sungai!"`,
+                  `"I have identified this invasive species using SiJaga Sungai AI!"`
+                )}
               </p>
             </div>
           </div>
 
-          <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '2.5rem', borderTop: '1px solid rgba(255,255,255,0.2)', marginTop: '3rem' }}>
+          <div style={{ position: 'relative', zIndex: 10, display: 'flex', items: 'center', justifyContent: 'space-between', paddingTop: '2.5rem', borderTop: '1px solid rgba(255,255,255,0.2)', marginTop: '3rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <div style={{ width: '4rem', height: '4rem', backgroundColor: '#ffffff', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <span style={{ color: '#2563eb', fontSize: '1.875rem', fontWeight: 900 }}>💧</span>
               </div>
               <div>
                 <p style={{ fontSize: '1.875rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.025em', margin: 0 }}>SiJaga Sungai</p>
-                <p style={{ fontSize: '1.25rem', color: 'rgba(255,255,255,0.7)', fontWeight: 500, margin: 0 }}>Kenali. Laporkan. Manfaatkan.</p>
+                <p style={{ fontSize: '1.25rem', color: 'rgba(255,255,255,0.7)', fontWeight: 500, margin: 0 }}>{t('Kenali. Laporkan. Manfaatkan.', 'Identify. Report. Utilize.')}</p>
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff', letterSpacing: '0.1em', opacity: 0.8, marginBottom: '0.25rem', margin: 0 }}>AI CONFIDENCE</p>
+              <p style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff', letterSpacing: '0.1em', opacity: 0.8, marginBottom: '0.25rem', margin: 0 }}>{t('AKURASI AI', 'AI ACCURACY')}</p>
               <p style={{ fontSize: '2.25rem', fontWeight: 900, color: '#ffffff', margin: 0 }}>{result.tingkatKeyakinan}</p>
             </div>
           </div>
