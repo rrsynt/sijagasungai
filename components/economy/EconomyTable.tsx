@@ -169,7 +169,9 @@ export function EconomyTable({ result, speciesId }: EconomyTableProps) {
                          pathway.kemudahan === 'SEDANG' ? 'bg-yellow-100 text-yellow-800' :
                          'bg-red-100 text-red-800'
                        }`}>
-                         {pathway.kemudahan}
+                         {pathway.kemudahan === 'MUDAH' ? t('MUDAH', 'EASY') : 
+                          pathway.kemudahan === 'SEDANG' ? t('SEDANG', 'MEDIUM') : 
+                          t('SULIT', 'HARD')}
                        </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
