@@ -377,7 +377,7 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
           </button>
         </div>
         {/* Row 2: Filters + count */}
-        <div className="flex items-center gap-2 px-2 py-1.5 bg-gray-50">
+        <div className="flex flex-wrap items-center gap-2 px-2 py-1.5 bg-gray-50">
           <select
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
