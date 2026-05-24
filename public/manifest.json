@@ -4,23 +4,43 @@
   "description": "Platform citizen science berbasis AI untuk identifikasi spesies ikan invasif di perairan Indonesia.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a7a4a",
-  "theme_color": "#1a7a4a",
+  "background_color": "#064e3b",
+  "theme_color": "#064e3b",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/images/og-image.png",
-      "sizes": "any",
+      "src": "/images/icon.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/images/og-image.png",
-      "sizes": "any",
+      "src": "/images/icon.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
   ],
-  "categories": ["education", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Identifikasi Ikan",
+      "short_name": "Identifikasi",
+      "description": "Ambil atau upload foto ikan untuk diidentifikasi secara instan dengan AI.",
+      "url": "/identify"
+    },
+    {
+      "name": "Peta Laporan",
+      "short_name": "Peta",
+      "description": "Lihat sebaran laporan spesies invasif di peta nasional secara real-time.",
+      "url": "/map"
+    },
+    {
+      "name": "Dashboard Analitis",
+      "short_name": "Dashboard",
+      "description": "Lihat statistik dan dampak kontribusi citizen science di Indonesia.",
+      "url": "/dashboard"
+    }
+  ],
+  "categories": ["environment", "education", "utilities"],
   "lang": "id"
 }
