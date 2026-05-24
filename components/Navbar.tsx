@@ -47,6 +47,16 @@ export function Navbar() {
       setIsOnline(false);
     };
     
+    // Check for mock reports URL parameter to ease presentation demos
+    const params = new URLSearchParams(window.location.search);
+    const mockReports = params.get('reports');
+    if (mockReports) {
+      const countNum = parseInt(mockReports, 10);
+      if (!isNaN(countNum) && countNum >= 0) {
+        localStorage.setItem('sijaga_report_count', countNum.toString());
+      }
+    }
+
     updateRank(); // Initial load
     updateOffline();
 
