@@ -9,6 +9,14 @@ interface Message {
   parts: [{ text: string }];
 }
 
+const QUICK_REPLIES = [
+  { emoji: '🐟', textId: 'Apa itu ikan invasif?', textEn: 'What is an invasive fish?' },
+  { emoji: '📸', textId: 'Cara identifikasi ikan?', textEn: 'How to identify fish?' },
+  { emoji: '💰', textId: 'Nilai ekonomi sapu-sapu?', textEn: 'Economic value of sapu-sapu?' },
+  { emoji: '🚨', textId: 'Spesies paling berbahaya?', textEn: 'Most dangerous species?' },
+  { emoji: '📍', textId: 'Cara lapor ke peta?', textEn: 'How to report to the map?' },
+];
+
 export function Chatbot() {
   const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
@@ -30,21 +38,37 @@ export function Chatbot() {
     dragStart.current = { mouseX: e.clientX, mouseY: e.clientY, posX: pos.x, posY: pos.y };
   }, [pos]);
 
+  // Touch drag support (mobile)
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    isDragging.current = true;
+    dragStart.current = { mouseX: touch.clientX, mouseY: touch.clientY, posX: pos.x, posY: pos.y };
+  }, [pos]);
+
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       if (!isDragging.current) return;
       const dx = dragStart.current.mouseX - e.clientX;
       const dy = dragStart.current.mouseY - e.clientY;
-      const newX = Math.max(8, dragStart.current.posX + dx);
-      const newY = Math.max(8, dragStart.current.posY + dy);
-      setPos({ x: newX, y: newY });
+      setPos({ x: Math.max(8, dragStart.current.posX + dx), y: Math.max(8, dragStart.current.posY + dy) });
     };
-    const onMouseUp = () => { isDragging.current = false; };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isDragging.current) return;
+      const touch = e.touches[0];
+      const dx = dragStart.current.mouseX - touch.clientX;
+      const dy = dragStart.current.mouseY - touch.clientY;
+      setPos({ x: Math.max(8, dragStart.current.posX + dx), y: Math.max(8, dragStart.current.posY + dy) });
+    };
+    const stop = () => { isDragging.current = false; };
     document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mouseup', stop);
+    document.addEventListener('touchmove', onTouchMove, { passive: true });
+    document.addEventListener('touchend', stop);
     return () => {
       document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mouseup', stop);
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', stop);
     };
   }, []);
 
@@ -112,6 +136,7 @@ export function Chatbot() {
         <div
           className="bg-blue-600 p-4 flex items-center justify-between text-white shrink-0 cursor-grab active:cursor-grabbing select-none"
           onMouseDown={onDragStart}
+          onTouchStart={onTouchStart}
         >
           <div className="flex items-center gap-3">
             <GripVertical className="w-4 h-4 text-blue-300 shrink-0" />
@@ -171,6 +196,39 @@ export function Chatbot() {
           )}
           <div ref={messagesEndRef} />
         </div>
+
+        {/* Quick Reply Chips — only when no user message yet */}
+        {messages.length <= 1 && !isLoading && (
+          <div className="px-3 pb-2 bg-white border-t border-gray-100 flex flex-wrap gap-1.5 pt-2 shrink-0">
+            {QUICK_REPLIES.map((qr) => (
+              <button
+                key={qr.textId}
+                type="button"
+                onClick={() => {
+                  const text = t(qr.textId, qr.textEn);
+                  setInput('');
+                  const newMessages: Message[] = [...messages, { role: 'user', parts: [{ text }] }];
+                  setMessages(newMessages);
+                  setIsLoading(true);
+                  fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, history: messages }),
+                  })
+                    .then(r => r.json())
+                    .then(d => {
+                      setMessages([...newMessages, { role: 'model', parts: [{ text: d.success ? d.text : 'Maaf, coba lagi nanti ya!' }] }]);
+                    })
+                    .catch(() => setMessages([...newMessages, { role: 'model', parts: [{ text: 'Koneksi terputus.' }] }]))
+                    .finally(() => setIsLoading(false));
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium rounded-full border border-blue-200 transition-colors"
+              >
+                <span>{qr.emoji}</span> {t(qr.textId, qr.textEn)}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Input Form */}
         <form onSubmit={handleSend} className="p-3 bg-white border-t border-gray-100 flex gap-2 shrink-0">
