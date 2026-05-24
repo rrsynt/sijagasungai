@@ -121,21 +121,81 @@ export default function AboutPage() {
               </div>
             </section>
 
-            {/* Tech Stack */}
+            {/* Powered by Google Showcase */}
             <section>
               <div className="flex items-center gap-4 mb-8 border-b-2 border-gray-900 pb-4">
                 <span className="text-sm font-black text-gray-400">02</span>
-                <h2 className="text-2xl font-black uppercase tracking-widest">{t('Teknologi', 'Technology')}</h2>
+                <h2 className="text-2xl font-black uppercase tracking-widest">{t('Integrasi Google', 'Google Showcase')}</h2>
               </div>
               
-              <ul className="space-y-0">
-                {techStack.map((tech, idx) => (
-                  <li key={idx} className="group py-6 border-b border-gray-300 flex flex-col sm:flex-row sm:items-baseline sm:justify-between hover:bg-gray-100 transition-colors px-4 -mx-4">
-                    <span className="text-lg font-black text-gray-900 uppercase tracking-wide group-hover:text-primary-sunai transition-colors">{tech.name}</span>
-                    <span className="text-sm font-medium text-gray-500 mt-1 sm:mt-0">{tech.desc}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                {t(
+                  'Sebagai aplikasi yang dibangun untuk Google Vibe Coding, SiJaga Sungai mengintegrasikan teknologi terdepan dari ekosistem Google untuk memberikan solusi tangguh, cepat, dan berdampak nyata.',
+                  'As an application built for Google Vibe Coding, SiJaga Sungai integrates cutting-edge technologies from the Google ecosystem to deliver a robust, fast, and high-impact solution.'
+                )}
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Gemini Card */}
+                <div className="border-2 border-gray-900 p-6 bg-gradient-to-br from-indigo-50 to-blue-50 hover:bg-white transition-all duration-300">
+                  <div className="w-12 h-12 bg-indigo-600 flex items-center justify-center text-white font-black mb-4">
+                    AI
+                  </div>
+                  <h3 className="text-lg font-black uppercase tracking-wider mb-2">Gemini 2.0 Flash</h3>
+                  <p className="text-xs font-bold text-indigo-700 uppercase tracking-widest mb-3">Vision & Text Engine</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {t(
+                      'Vision AI tercanggih yang menganalisis foto ikan seketika untuk mendeteksi spesies invasif, mengukur tingkat bahaya, serta merumuskan rekomendasi aksi penanganan.',
+                      'State-of-the-art Vision AI that instantly analyzes fish photos to detect invasive species, gauge threat levels, and generate actionable management guidelines.'
+                    )}
+                  </p>
+                </div>
+
+                {/* Google Maps Card */}
+                <div className="border-2 border-gray-900 p-6 bg-gradient-to-br from-emerald-50 to-teal-50 hover:bg-white transition-all duration-300">
+                  <div className="w-12 h-12 bg-emerald-600 flex items-center justify-center text-white font-black mb-4">
+                    MAP
+                  </div>
+                  <h3 className="text-lg font-black uppercase tracking-wider mb-2">Google Maps API</h3>
+                  <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest mb-3">Geospatial Platform</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {t(
+                      'Visualisasi peta interaktif nasional dengan Marker Clustering dan Heatmap responsif untuk melacak titik kerawanan invasi spesies asing di perairan tawar.',
+                      'Interactive national map visualization using Marker Clustering and responsive Heatmaps to track alien species invasion hotspots across freshwater bodies.'
+                    )}
+                  </p>
+                </div>
+
+                {/* Cloud Run Card */}
+                <div className="border-2 border-gray-900 p-6 bg-gradient-to-br from-blue-50 to-cyan-50 hover:bg-white transition-all duration-300">
+                  <div className="w-12 h-12 bg-blue-600 flex items-center justify-center text-white font-black mb-4">
+                    SRV
+                  </div>
+                  <h3 className="text-lg font-black uppercase tracking-wider mb-2">Google Cloud Run</h3>
+                  <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-3">Serverless Infrastructure</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {t(
+                      'Menjalankan seluruh backend serverless Next.js dengan latensi minimal di Region Jakarta (asia-southeast2) untuk performa instan di seluruh pelosok negeri.',
+                      'Runs the entire serverless Next.js application with minimum latency in the Jakarta Region (asia-southeast2) for instant response across the archipelago.'
+                    )}
+                  </p>
+                </div>
+
+                {/* Firestore Card */}
+                <div className="border-2 border-gray-900 p-6 bg-gradient-to-br from-amber-50 to-orange-50 hover:bg-white transition-all duration-300">
+                  <div className="w-12 h-12 bg-amber-600 flex items-center justify-center text-white font-black mb-4">
+                    DB
+                  </div>
+                  <h3 className="text-lg font-black uppercase tracking-wider mb-2">Firebase Firestore</h3>
+                  <p className="text-xs font-bold text-amber-700 uppercase tracking-widest mb-3">Citizen Science Database</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {t(
+                      'Penyimpanan database NoSQL terdistribusi berkinerja tinggi untuk merekam laporan masyarakat secara realtime dengan dukungan sinkronisasi luring (offline).',
+                      'High-performance distributed NoSQL database storing public reports in real-time, built with full offline synchronization support for remote field reporting.'
+                    )}
+                  </p>
+                </div>
+              </div>
             </section>
 
           </div>
