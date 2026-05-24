@@ -10,3 +10,5 @@ coverage/
 # Debug & tool artifacts
 localhost_*.json
 parse_lighthouse.js
+
+.cloudrun-env.yaml

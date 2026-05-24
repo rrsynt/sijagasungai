@@ -132,7 +132,7 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: apiKey,
-    libraries: ['visualization']
+    libraries: [] as any
   });
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -175,36 +175,77 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
     }
   }, []);
 
-  // Use a ref to always hold the latest layer — avoids stale closure in cleanup
-  const heatmapLayerRef = useRef<google.maps.visualization.HeatmapLayer | null>(null);
+  // Use a ref to hold the custom canvas heatmap overlay
+  const heatmapLayerRef = useRef<google.maps.OverlayView | null>(null);
 
   useEffect(() => {
-    if (!map || !isLoaded || typeof google === 'undefined' || !google.maps.visualization) return;
+    if (!map || !isLoaded || typeof google === 'undefined') return;
 
-    // Always destroy the old layer first
+    // Destroy old overlay
     if (heatmapLayerRef.current) {
       heatmapLayerRef.current.setMap(null);
-      // eslint-disable-next-line react-hooks/immutability
       heatmapLayerRef.current = null;
     }
 
     if (showHeatmap && displayedReports.length > 0) {
-      const heatMapData = displayedReports.map(
-        r => new google.maps.LatLng(r.geometry.coordinates[1], r.geometry.coordinates[0])
-      );
-      heatmapLayerRef.current = new google.maps.visualization.HeatmapLayer({
-        data: heatMapData,
-        map: map,
-        radius: 40,
-        opacity: 0.9,
-        gradient: [
-          'rgba(0, 0, 0, 0)',
-          'rgba(255, 204, 0, 1)',
-          'rgba(255, 102, 0, 1)',
-          'rgba(204, 0, 0, 1)',
-          'rgba(153, 0, 0, 1)'
-        ]
-      });
+      const points = displayedReports.map(r => ({
+        lat: r.geometry.coordinates[1],
+        lng: r.geometry.coordinates[0],
+      }));
+
+      // Custom canvas heatmap — replaces deprecated HeatmapLayer (removed in v3.65)
+      const overlay = new google.maps.OverlayView();
+      let canvas: HTMLCanvasElement | null = null;
+      let listenerId: google.maps.MapsEventListener | null = null;
+
+      const drawHeatmap = () => {
+        if (!canvas || !map) return;
+        const proj = overlay.getProjection();
+        if (!proj) return;
+        const mapDiv = map.getDiv();
+        const w = mapDiv.offsetWidth;
+        const h = mapDiv.offsetHeight;
+        if (!w || !h) return;
+        canvas.width  = w;
+        canvas.height = h;
+        canvas.style.width  = w + 'px';
+        canvas.style.height = h + 'px';
+
+        const ctx = canvas.getContext('2d')!;
+        ctx.clearRect(0, 0, w, h);
+        ctx.globalCompositeOperation = 'screen';
+
+        for (const pt of points) {
+          const px = proj.fromLatLngToDivPixel(new google.maps.LatLng(pt.lat, pt.lng));
+          if (!px) continue;
+          const r = 50;
+          const g = ctx.createRadialGradient(px.x, px.y, 0, px.x, px.y, r);
+          g.addColorStop(0,   'rgba(180,  0,  0, 0.85)');
+          g.addColorStop(0.3, 'rgba(220, 50,  0, 0.55)');
+          g.addColorStop(0.6, 'rgba(255,140,  0, 0.30)');
+          g.addColorStop(1,   'rgba(255,220,  0, 0.00)');
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(px.x, px.y, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      };
+
+      overlay.onAdd = function () {
+        canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;';
+        this.getPanes()!.overlayLayer.appendChild(canvas);
+        listenerId = map.addListener('bounds_changed', drawHeatmap);
+      };
+      overlay.draw = drawHeatmap;
+      overlay.onRemove = function () {
+        if (listenerId) google.maps.event.removeListener(listenerId);
+        canvas?.parentNode?.removeChild(canvas);
+        canvas = null;
+      };
+
+      overlay.setMap(map);
+      heatmapLayerRef.current = overlay;
     }
 
     return () => {
