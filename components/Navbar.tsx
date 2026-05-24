@@ -15,6 +15,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/identify', labelId: 'Identifikasi', labelEn: 'Identify' },
     { href: '/map', labelId: 'Peta', labelEn: 'Map' },
+    { href: '/dashboard', labelId: 'Dashboard', labelEn: 'Dashboard' },
     { href: '/economy', labelId: 'Ekonomi', labelEn: 'Economy' },
     { href: '/education', labelId: 'Edukasi', labelEn: 'Education' },
     { href: '/prevention', labelId: 'Pencegahan', labelEn: 'Prevention' },
