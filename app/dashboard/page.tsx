@@ -242,7 +242,7 @@ export default function DashboardPage() {
             <span className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-4">{t('Total Spesimen Ditangkap', 'Total Catch Quantity')}</span>
             <div>
               <p className="text-5xl font-black text-gray-900 leading-none mb-1">{stats.totalQty}</p>
-              <p className="text-xs font-semibold text-gray-500">ekor ikan berhasil diekstraksi</p>
+              <p className="text-xs font-semibold text-gray-500">{t('ekor ikan berhasil diekstraksi', 'fish caught successfully extracted')}</p>
             </div>
           </div>
 
@@ -263,7 +263,7 @@ export default function DashboardPage() {
             <span className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-4">{t('Provinsi Terdampak', 'Affected Provinces')}</span>
             <div>
               <p className="text-5xl font-black text-gray-900 leading-none mb-1">{Object.keys(stats.provinceMap).length}</p>
-              <p className="text-xs font-semibold text-gray-500">wilayah sebaran terdata</p>
+              <p className="text-xs font-semibold text-gray-500">{t('wilayah sebaran terdata', 'mapped distribution regions')}</p>
             </div>
           </div>
         </div>
@@ -288,7 +288,7 @@ export default function DashboardPage() {
                   <div key={i} className="flex flex-col items-center flex-1 group">
                     {/* Hover Tooltip */}
                     <span className="opacity-0 group-hover:opacity-100 bg-gray-900 text-white text-[10px] font-bold px-2 py-1 absolute bottom-[180px] transition-all duration-300 pointer-events-none rounded">
-                      {d.count} Laporan
+                      {d.count} {t('Laporan', 'Reports')}
                     </span>
                     {/* Bar representing data */}
                     <div 
@@ -341,7 +341,10 @@ export default function DashboardPage() {
             </div>
             
             <div className="mt-6 pt-4 border-t border-gray-100 text-[10px] text-gray-500 leading-normal">
-              * Klasifikasi status mengikuti regulasi resmi KemenKP Permen No. 19/2020 tentang Spesies Asing Invasif.
+              {t(
+                '* Klasifikasi status mengikuti regulasi resmi KemenKP Permen No. 19/2020 tentang Spesies Asing Invasif.',
+                '* Status classification follows official KKP Regulation Permen No. 19/2020 on Invasive Alien Species.'
+              )}
             </div>
           </div>
         </div>
@@ -362,7 +365,7 @@ export default function DashboardPage() {
                       <span className="w-5 h-5 bg-gray-950 text-white text-[10px] font-black flex items-center justify-center rounded-full">{i + 1}</span>
                       <span className="font-bold text-gray-800">{prov.name}</span>
                     </div>
-                    <span className="font-extrabold text-gray-600">{prov.count} Laporan</span>
+                    <span className="font-extrabold text-gray-600">{prov.count} {t('Laporan', 'Reports')}</span>
                   </li>
                 ))}
               </ul>
@@ -380,7 +383,7 @@ export default function DashboardPage() {
                       <span className="w-5 h-5 bg-gray-950 text-white text-[10px] font-black flex items-center justify-center rounded-full">{i + 1}</span>
                       <span className="font-bold text-gray-800">{spec.name}</span>
                     </div>
-                    <span className="font-extrabold text-gray-600">{spec.count} Laporan</span>
+                    <span className="font-extrabold text-gray-600">{spec.count} {t('Laporan', 'Reports')}</span>
                   </li>
                 ))}
               </ul>
@@ -402,7 +405,7 @@ export default function DashboardPage() {
                   <p className="text-xs font-medium text-gray-700 mb-2">{r.properties.locationName}</p>
                   <div className="flex justify-between items-center text-[10px] text-gray-500">
                     <span>{new Date(r.properties.reportedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>
-                    <span>{r.properties.quantity} ekor</span>
+                    <span>{r.properties.quantity} {t('ekor', 'specimens')}</span>
                   </div>
                 </div>
               ))}
