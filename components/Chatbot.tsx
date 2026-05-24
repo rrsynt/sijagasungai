@@ -18,11 +18,18 @@ const QUICK_REPLIES = [
 ];
 
 export function Chatbot() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', parts: [{ text: 'Halo! Saya SiJaga 🤖. Ada yang bisa saya bantu tentang ikan invasif atau cara pakai aplikasi ini?' }] }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    if (messages.length <= 1) {
+      setMessages([
+        { role: 'model', parts: [{ text: t('Halo! Saya SiJaga 🤖. Ada yang bisa saya bantu tentang ikan invasif atau cara pakai aplikasi ini?', 'Hello! I am SiJaga 🤖. How can I help you regarding invasive fish or how to use this app?') }] }
+      ]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -100,10 +107,10 @@ export function Chatbot() {
       if (data.success) {
         setMessages([...newMessages, { role: 'model', parts: [{ text: data.text }] }]);
       } else {
-        setMessages([...newMessages, { role: 'model', parts: [{ text: 'Maaf, sistem saya sedang gangguan. Coba lagi nanti ya!' }] }]);
+        setMessages([...newMessages, { role: 'model', parts: [{ text: t('Maaf, sistem saya sedang gangguan. Coba lagi nanti ya!', 'Sorry, my system is currently experiencing issues. Please try again later!') }] }]);
       }
     } catch {
-      setMessages([...newMessages, { role: 'model', parts: [{ text: 'Maaf, koneksi terputus. Cek internet kamu ya.' }] }]);
+      setMessages([...newMessages, { role: 'model', parts: [{ text: t('Maaf, koneksi terputus. Cek internet kamu ya.', 'Sorry, connection lost. Please check your internet connection.') }] }]);
     } finally {
       setIsLoading(false);
     }
@@ -145,7 +152,7 @@ export function Chatbot() {
             </div>
             <div>
               <h3 className="font-bold leading-tight">SiJaga AI</h3>
-              <p className="text-xs text-blue-200">Tahan & seret untuk pindah</p>
+              <p className="text-xs text-blue-200">{t('Tahan & seret untuk pindah', 'Hold & drag to move')}</p>
             </div>
           </div>
           <button
@@ -217,9 +224,9 @@ export function Chatbot() {
                   })
                     .then(r => r.json())
                     .then(d => {
-                      setMessages([...newMessages, { role: 'model', parts: [{ text: d.success ? d.text : 'Maaf, coba lagi nanti ya!' }] }]);
+                      setMessages([...newMessages, { role: 'model', parts: [{ text: d.success ? d.text : t('Maaf, coba lagi nanti ya!', 'Sorry, please try again later!') }] }]);
                     })
-                    .catch(() => setMessages([...newMessages, { role: 'model', parts: [{ text: 'Koneksi terputus.' }] }]))
+                    .catch(() => setMessages([...newMessages, { role: 'model', parts: [{ text: t('Koneksi terputus.', 'Connection lost.') }] }]))
                     .finally(() => setIsLoading(false));
                 }}
                 className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium rounded-full border border-blue-200 transition-colors"
