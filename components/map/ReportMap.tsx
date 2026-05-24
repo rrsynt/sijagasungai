@@ -202,31 +202,51 @@ function ReportMapInner({ apiKey }: { apiKey: string }) {
         if (!canvas || !map) return;
         const proj = overlay.getProjection();
         if (!proj) return;
-        const mapDiv = map.getDiv();
-        const w = mapDiv.offsetWidth;
-        const h = mapDiv.offsetHeight;
+        const bounds = map.getBounds();
+        if (!bounds) return;
+
+        // World pixel coords of the viewport corners within the overlay pane
+        const ne = proj.fromLatLngToDivPixel(bounds.getNorthEast());
+        const sw = proj.fromLatLngToDivPixel(bounds.getSouthWest());
+        if (!ne || !sw) return;
+
+        const left = Math.min(ne.x, sw.x);
+        const top  = Math.min(ne.y, sw.y);
+        const w    = Math.abs(ne.x - sw.x);
+        const h    = Math.abs(ne.y - sw.y);
         if (!w || !h) return;
+
+        // Position canvas to exactly cover the viewport
+        canvas.style.left   = left + 'px';
+        canvas.style.top    = top  + 'px';
+        canvas.style.width  = w    + 'px';
+        canvas.style.height = h    + 'px';
         canvas.width  = w;
         canvas.height = h;
-        canvas.style.width  = w + 'px';
-        canvas.style.height = h + 'px';
 
         const ctx = canvas.getContext('2d')!;
         ctx.clearRect(0, 0, w, h);
         ctx.globalCompositeOperation = 'screen';
 
+        // Radius scales with zoom: ~25px at z=5, ~50px at z=7
+        const zoom = map.getZoom() ?? 5;
+        const r = Math.max(18, Math.min(70, 6 * Math.pow(2, zoom - 3)));
+
         for (const pt of points) {
           const px = proj.fromLatLngToDivPixel(new google.maps.LatLng(pt.lat, pt.lng));
           if (!px) continue;
-          const r = 50;
-          const g = ctx.createRadialGradient(px.x, px.y, 0, px.x, px.y, r);
+          // Coordinates relative to canvas top-left
+          const x = px.x - left;
+          const y = px.y - top;
+          if (x < -r || x > w + r || y < -r || y > h + r) continue;
+          const g = ctx.createRadialGradient(x, y, 0, x, y, r);
           g.addColorStop(0,   'rgba(180,  0,  0, 0.85)');
           g.addColorStop(0.3, 'rgba(220, 50,  0, 0.55)');
           g.addColorStop(0.6, 'rgba(255,140,  0, 0.30)');
           g.addColorStop(1,   'rgba(255,220,  0, 0.00)');
           ctx.fillStyle = g;
           ctx.beginPath();
-          ctx.arc(px.x, px.y, r, 0, Math.PI * 2);
+          ctx.arc(x, y, r, 0, Math.PI * 2);
           ctx.fill();
         }
       };
