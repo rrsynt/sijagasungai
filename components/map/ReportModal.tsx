@@ -529,7 +529,8 @@ export function ReportModal({ onClose, onSuccess, initialSpeciesName }: ReportMo
                         justifyContent: 'space-between',
                         position: 'relative'
                       }}
-                                 <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, color: '#ffffff', gap: '1.5rem' }}>
+                    >
+                      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, color: '#ffffff', gap: '1.5rem' }}>
                         <div style={{ backgroundColor: 'rgba(255,255,255,0.2)', padding: '0.75rem 2rem', borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.3)', letterSpacing: '0.2em', fontWeight: 900, fontSize: '1.25rem', color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase', marginBottom: '1rem' }}>
                           {t('BUKTI LAPORAN SIJAGA SUNGAI', 'SIJAGA SUNGAI REPORT RECEIPT')}
                         </div>
@@ -596,7 +597,7 @@ export function ReportModal({ onClose, onSuccess, initialSpeciesName }: ReportMo
                           <p style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff', letterSpacing: '0.1em', opacity: 0.8, marginBottom: '0.25rem', margin: 0 }}>{t('ID LAPORAN', 'REPORT ID')}</p>
                           <p style={{ fontSize: '1.5rem', fontFamily: 'monospace', fontWeight: 900, color: '#ffffff', margin: 0 }}>{generatedReport?.laporanResmi?.idLaporan}</p>
                         </div>
-                      </div>           </div>
+                      </div>
                     </div>
                   </div>
                 );
