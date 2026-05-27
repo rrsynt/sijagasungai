@@ -158,11 +158,12 @@ const groqPool    = parseKeyPool('GROQ_API_KEYS',    'GROQ_API_KEY');
 const orPool      = parseKeyPool('OPENROUTER_API_KEYS', 'OPENROUTER_API_KEY');
 const hyperPool   = parseKeyPool('HYPERBOLIC_API_KEYS', 'HYPERBOLIC_API_KEY');
 
-// Fallback chain: Groq → OpenRouter → Hyperbolic (only active if key configured)
+// Vision fallback chain: Groq → OpenRouter (text+vision). Groq confirmed working with real images.
+// Note: OpenRouter gemini-2.0-flash-001 may cost ~$0.00001/req but is very reliable.
 const fallbackChain = new ProviderChain([
-  { name: 'Groq',       baseUrl: 'https://api.groq.com/openai/v1',  pool: groqPool,  model: 'llama-3.2-11b-vision-preview' },
-  { name: 'OpenRouter', baseUrl: 'https://openrouter.ai/api/v1',    pool: orPool,    model: 'google/gemini-2.0-flash-exp:free' },
-  { name: 'Hyperbolic', baseUrl: 'https://api.hyperbolic.xyz/v1',   pool: hyperPool, model: 'Qwen/Qwen2-VL-72B-Instruct' },
+  { name: 'Groq',        baseUrl: 'https://api.groq.com/openai/v1',         pool: groqPool, model: 'meta-llama/llama-4-scout-17b-16e-instruct' },
+  { name: 'OpenRouter',  baseUrl: 'https://openrouter.ai/api/v1',           pool: orPool,   model: 'google/gemini-2.0-flash-001' },
+  { name: 'Hyperbolic',  baseUrl: 'https://api.hyperbolic.xyz/v1',          pool: hyperPool, model: 'Qwen/Qwen2-VL-72B-Instruct' },
 ]);
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -419,7 +420,8 @@ ATURAN: fotoKurangJelas = true HANYA jika foto benar-benar buram/gelap total. Fo
               { type: 'text', text: prompt },
             ],
           }],
-          response_format: { type: 'json_object' },
+          // NOTE: response_format NOT set — not all vision providers support it.
+          // parseJsonResponse() already handles raw JSON and markdown-fenced JSON.
           temperature: 0.1,
           max_tokens: 2048,
         }),
