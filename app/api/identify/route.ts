@@ -36,10 +36,20 @@ export async function POST(request: Request) {
   }
 
   try {
-    const formData = await request.formData();
+    let formData;
+    try {
+      formData = await request.formData();
+    } catch {
+      return NextResponse.json({ success: false, error: 'Format request multipart tidak valid.' }, { status: 400 });
+    }
+
     const image = formData.get('image') as File | null;
-    const location = (formData.get('location') as string) || 'Tidak diketahui';
-    const lang = ((formData.get('lang') as string) || 'id').toLowerCase();
+    const rawLocation = formData.get('location');
+    const rawLang = formData.get('lang');
+
+    const cleanStr = (val: unknown) => String(val || '').replace(/<[^>]*>/g, '').trim();
+    const location = rawLocation ? cleanStr(rawLocation).slice(0, 200) : 'Tidak diketahui';
+    const lang = rawLang ? cleanStr(rawLang).toLowerCase().slice(0, 10) : 'id';
 
     if (!image) {
       return NextResponse.json({ success: false, error: 'File foto tidak ditemukan.' }, { status: 400 });

@@ -144,17 +144,23 @@ export default function DashboardPage() {
     reports.forEach(r => {
       const date = new Date(r.properties.reportedAt);
       if (!isNaN(date.getTime())) {
-        const key = date.toLocaleString('id-ID', { month: 'short' });
+        const year = date.getFullYear();
+        const month = date.getMonth(); // 0-11
+        const key = `${year}-${month}`;
         mapCount[key] = (mapCount[key] || 0) + 1;
       }
     });
 
+    const INDO_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const key = d.toLocaleString('id-ID', { month: 'short' });
+      const year = d.getFullYear();
+      const month = d.getMonth();
+      const key = `${year}-${month}`;
       months.push({
-        month: key,
-        count: mapCount[key] || Math.floor(Math.random() * 4) + 2, // smooth dummy fallback for visual trend
+        month: INDO_MONTHS[month],
+        count: mapCount[key] || ((i * 7 + 11) % 4) + 2, // stable deterministic fallback for visual trend
       });
     }
 
@@ -283,18 +289,20 @@ export default function DashboardPage() {
             {/* Premium custom SVG chart */}
             <div className="relative flex-1 min-h-[220px] flex items-end justify-between pt-4 px-4 border-b border-gray-200">
               {trendData.map((d, i) => {
-                const heightPercent = (d.count / maxTrend) * 80; // max height 80%
+                const heightPercent = (d.count / maxTrend) * 90; // max height 90%
                 return (
                   <div key={i} className="flex flex-col items-center flex-1 group">
                     {/* Hover Tooltip */}
                     <span className="opacity-0 group-hover:opacity-100 bg-gray-900 text-white text-[10px] font-bold px-2 py-1 absolute bottom-[180px] transition-all duration-300 pointer-events-none rounded">
                       {d.count} {t('Laporan', 'Reports')}
                     </span>
-                    {/* Bar representing data */}
-                    <div 
-                      style={{ height: `${heightPercent}%` }}
-                      className="w-8 sm:w-12 bg-gray-900 hover:bg-primary-sunai transition-all duration-300"
-                    ></div>
+                    {/* Bar wrapper with fixed height */}
+                    <div className="w-full h-36 flex items-end justify-center">
+                      <div 
+                        style={{ height: `${heightPercent}%` }}
+                        className="w-8 sm:w-12 bg-gray-900 hover:bg-primary-sunai transition-all duration-300"
+                      ></div>
+                    </div>
                     <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 mt-3">{d.month}</span>
                   </div>
                 );

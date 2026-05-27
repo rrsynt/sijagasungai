@@ -160,7 +160,7 @@ const hyperPool   = parseKeyPool('HYPERBOLIC_API_KEYS', 'HYPERBOLIC_API_KEY');
 
 // Fallback chain: Groq → OpenRouter → Hyperbolic (only active if key configured)
 const fallbackChain = new ProviderChain([
-  { name: 'Groq',       baseUrl: 'https://api.groq.com/openai/v1',  pool: groqPool,  model: 'meta-llama/llama-4-scout-17b-16e-instruct' },
+  { name: 'Groq',       baseUrl: 'https://api.groq.com/openai/v1',  pool: groqPool,  model: 'llama-3.2-11b-vision-preview' },
   { name: 'OpenRouter', baseUrl: 'https://openrouter.ai/api/v1',    pool: orPool,    model: 'google/gemini-2.0-flash-exp:free' },
   { name: 'Hyperbolic', baseUrl: 'https://api.hyperbolic.xyz/v1',   pool: hyperPool, model: 'Qwen/Qwen2-VL-72B-Instruct' },
 ]);
@@ -1048,6 +1048,116 @@ Return a JSON object matching this schema:
           { step_number: 2, instruction: "Hati-hati dengan duri tajam." }
         ],
         safety_warnings: ["Cuci tangan setelah memegang ikan."]
+      };
+    }
+  }
+
+  public async compareSpecies(speciesAName: string, speciesBName: string, lang: string) {
+    try {
+      const prompt = `
+${SIJAGA_SYSTEM_PROMPT}
+
+Bandingkan dua spesies ikan berikut side-by-side secara ilmiah namun mudah dipahami nelayan/pemancing:
+- Spesies A: ${speciesAName}
+- Spesies B: ${speciesBName}
+
+Bahasa respons: ${lang === 'en' ? 'English' : 'Bahasa Indonesia'}
+
+TUGASMU:
+Analisis kedua spesies tersebut dan kembalikan HANYA valid JSON dengan schema berikut:
+{
+  "spesiesA": {
+    "nama": "string",
+    "namaIlmiah": "string",
+    "status": "string (ASLI / INTRODUKSI / INVASIF)",
+    "ciriFisik": ["string", "string"],
+    "dampak": "string"
+  },
+  "spesiesB": {
+    "nama": "string",
+    "namaIlmiah": "string",
+    "status": "string (ASLI / INTRODUKSI / INVASIF)",
+    "ciriFisik": ["string", "string"],
+    "dampak": "string"
+  },
+  "perbedaanUtama": [
+    {
+      "aspek": "string (misal: Bentuk Mulut, Pola Warna, Gigi)",
+      "detailA": "string",
+      "detailB": "string"
+    }
+  ],
+  "caraMembedakanCepat": "string (paragraf singkat berisi tips paling gampang membedakan keduanya saat baru ditangkap)",
+  "rekomendasiAksi": "string (rekomendasi tindakan untuk masing-masing spesies jika tertangkap)"
+}
+
+ATURAN:
+1. Perbedaan utama harus memiliki minimal 3 aspek penting.
+2. Status perairan (ASLI / INTRODUKSI / INVASIF) harus akurat sesuai kondisi di Indonesia.
+3. HANYA kembalikan JSON valid, tidak ada teks lain.
+      `;
+
+      const response = await this.callGemini({
+        model: this.defaultModel,
+        contents: prompt,
+        config: {
+          systemInstruction: SIJAGA_SYSTEM_PROMPT,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              spesiesA: {
+                type: Type.OBJECT,
+                properties: {
+                  nama: { type: Type.STRING },
+                  namaIlmiah: { type: Type.STRING },
+                  status: { type: Type.STRING },
+                  ciriFisik: { type: Type.ARRAY, items: { type: Type.STRING } },
+                  dampak: { type: Type.STRING }
+                },
+                required: ["nama", "namaIlmiah", "status", "ciriFisik", "dampak"]
+              },
+              spesiesB: {
+                type: Type.OBJECT,
+                properties: {
+                  nama: { type: Type.STRING },
+                  namaIlmiah: { type: Type.STRING },
+                  status: { type: Type.STRING },
+                  ciriFisik: { type: Type.ARRAY, items: { type: Type.STRING } },
+                  dampak: { type: Type.STRING }
+                },
+                required: ["nama", "namaIlmiah", "status", "ciriFisik", "dampak"]
+              },
+              perbedaanUtama: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    aspek: { type: Type.STRING },
+                    detailA: { type: Type.STRING },
+                    detailB: { type: Type.STRING }
+                  },
+                  required: ["aspek", "detailA", "detailB"]
+                }
+              },
+              caraMembedakanCepat: { type: Type.STRING },
+              rekomendasiAksi: { type: Type.STRING }
+            },
+            required: ["spesiesA", "spesiesB", "perbedaanUtama", "caraMembedakanCepat", "rekomendasiAksi"]
+          }
+        }
+      });
+
+      return this.parseJsonResponse<any>(response.text || "");
+
+    } catch (error) {
+      console.error("Error in compareSpecies:", error);
+      return {
+        spesiesA: { nama: speciesAName, namaIlmiah: "Unknown", status: "Tidak Diketahui", ciriFisik: [], dampak: "-" },
+        spesiesB: { nama: speciesBName, namaIlmiah: "Unknown", status: "Tidak Diketahui", ciriFisik: [], dampak: "-" },
+        perbedaanUtama: [],
+        caraMembedakanCepat: "Gagal memproses perbandingan melalui AI.",
+        rekomendasiAksi: "Coba lagi nanti."
       };
     }
   }

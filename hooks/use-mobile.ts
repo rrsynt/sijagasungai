@@ -11,7 +11,6 @@ export function useIsMobile() {
       setIsMobile(e.matches)
     }
     mql.addEventListener("change", onChange)
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMobile(mql.matches)
     return () => mql.removeEventListener("change", onChange)
   }, [])

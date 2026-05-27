@@ -257,6 +257,31 @@ export function EconomyTable({ result, speciesId }: EconomyTableProps) {
         </table>
       </div>
 
+      {/* Visual Chart: Economic Comparison */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-6">{t('Perbandingan Nilai Hasil Pemanfaatan', 'Utilization Value Comparison')}</h3>
+        <div className="space-y-5">
+          {result.jalurPemanfaatan.map((pathway, idx) => {
+            const maxVal = Math.max(...result.jalurPemanfaatan.map(p => p.estimasiNilai), 1);
+            const pct = (pathway.estimasiNilai / maxVal) * 100;
+            return (
+              <div key={idx} className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="font-bold text-gray-900">{pathway.nama}</span>
+                  <span className="font-semibold text-gray-600">Rp {pathway.estimasiNilai.toLocaleString('id-ID')}</span>
+                </div>
+                <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-emerald-500 to-primary-sunai rounded-full transition-all duration-500" 
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
           <h3 className="text-lg font-bold text-gray-900 mb-4">{t('Rekomendasi Terbaik', 'Best Recommendation')}</h3>

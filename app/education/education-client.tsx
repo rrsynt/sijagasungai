@@ -4,10 +4,12 @@ import { Suspense, useState, useEffect } from 'react';
 import { SPECIES_DATABASE } from '@/lib/species-database';
 import { SpeciesCard } from '@/components/education/SpeciesCard';
 import { QuizPanel } from '@/components/education/QuizPanel';
+import { ClassifierGame } from '@/components/education/ClassifierGame';
 import { useLanguage } from '@/components/LanguageContext';
 import { BookOpen, X, ImageIcon, Lightbulb, Activity, Globe } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useSearchParams } from 'next/navigation';
+import { SpeciesCompare } from '@/components/education/SpeciesCompare';
 
 function EducationContent() {
   const { t, language } = useLanguage();
@@ -16,11 +18,12 @@ function EducationContent() {
   const [activeTab, setActiveTab] = useState<'info' | 'quiz'>('info');
   const [cardData, setCardData] = useState<any>(null);
   const [loadingCard, setLoadingCard] = useState(false);
+  const [eduSection, setEduSection] = useState<'catalog' | 'compare'>('catalog');
 
   // Persistent Badges State
   const [badges, setBadges] = useState<string[]>([]);
 
-  useEffect(() => {
+  const fetchBadges = () => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('sijaga_badges');
       if (stored) {
@@ -29,6 +32,17 @@ function EducationContent() {
         } catch {}
       }
     }
+  };
+
+  useEffect(() => {
+    fetchBadges();
+    const handleUpdate = () => {
+      fetchBadges();
+    };
+    window.addEventListener('sijaga_badges_update', handleUpdate);
+    return () => {
+      window.removeEventListener('sijaga_badges_update', handleUpdate);
+    };
   }, []);
 
   const speciesList = Object.values(SPECIES_DATABASE);
@@ -55,7 +69,6 @@ function EducationContent() {
   useEffect(() => {
     const prefilledSpecies = searchParams.get('species');
     if (prefilledSpecies && SPECIES_DATABASE[prefilledSpecies]) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       handleCardClick(prefilledSpecies);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -72,13 +85,14 @@ function EducationContent() {
       if (prev.includes(earnedBadge)) return prev;
       const updated = [...prev, earnedBadge];
       localStorage.setItem('sijaga_badges', JSON.stringify(updated));
+      window.dispatchEvent(new Event('sijaga_badges_update'));
       return updated;
     });
   };
 
   return (
     <div className="min-h-screen bg-[#fafaf8] py-16 sm:py-24 relative">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="mb-16 border-b border-gray-200 pb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
@@ -106,11 +120,44 @@ function EducationContent() {
           )}
         </div>
 
-        <div className="flex flex-col gap-0 border-t border-gray-200">
-          {speciesList.map(species => (
-            <SpeciesCard key={species.id} species={species} onClick={handleCardClick} />
-          ))}
+        {/* Tab Switcher */}
+        <div className="flex border-b border-gray-300 mb-10">
+          <button
+            onClick={() => setEduSection('catalog')}
+            className={`flex-1 py-4 text-sm font-bold uppercase tracking-widest transition-colors ${
+              eduSection === 'catalog' ? 'border-b-4 border-gray-900 text-gray-900' : 'text-gray-400 hover:text-gray-700'
+            }`}
+          >
+            {t('Ensiklopedia & Game', 'Encyclopedia & Game')}
+          </button>
+          <button
+            onClick={() => setEduSection('compare')}
+            className={`flex-1 py-4 text-sm font-bold uppercase tracking-widest transition-colors ${
+              eduSection === 'compare' ? 'border-b-4 border-gray-900 text-gray-900' : 'text-gray-400 hover:text-gray-700'
+            }`}
+          >
+            {t('Bandingkan Spesies (AI)', 'Compare Species (AI)')}
+          </button>
         </div>
+
+        {eduSection === 'catalog' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start animate-in fade-in duration-500">
+            <div className="lg:col-span-7">
+              <div className="flex flex-col gap-0 border-t border-gray-200">
+                {speciesList.map(species => (
+                  <SpeciesCard key={species.id} species={species} onClick={handleCardClick} />
+                ))}
+              </div>
+            </div>
+            <div className="lg:col-span-5 lg:sticky lg:top-24">
+              <ClassifierGame />
+            </div>
+          </div>
+        ) : (
+          <div className="animate-in fade-in duration-500">
+            <SpeciesCompare />
+          </div>
+        )}
       </div>
 
       {/* Modal */}

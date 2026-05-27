@@ -647,7 +647,7 @@ export function IdentifyResult({ result, speciesId, uploadedImage }: IdentifyRes
             </div>
           </div>
 
-          <div style={{ position: 'relative', zIndex: 10, display: 'flex', items: 'center', justifyContent: 'space-between', paddingTop: '2.5rem', borderTop: '1px solid rgba(255,255,255,0.2)', marginTop: '3rem' }}>
+          <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '2.5rem', borderTop: '1px solid rgba(255,255,255,0.2)', marginTop: '3rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <div style={{ width: '4rem', height: '4rem', backgroundColor: '#ffffff', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <span style={{ color: '#2563eb', fontSize: '1.875rem', fontWeight: 900 }}>💧</span>

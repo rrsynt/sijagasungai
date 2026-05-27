@@ -21,7 +21,8 @@ const MAX_FIELD_LENGTH = 300;
 
 function sanitizeString(value: unknown): string {
   if (typeof value !== 'string') return '';
-  return value.replace(/[\x00-\x1F\x7F]/g, '').slice(0, MAX_FIELD_LENGTH).trim();
+  // Strip HTML tags and control characters
+  return value.replace(/<[^>]*>/g, '').replace(/[\x00-\x1F\x7F]/g, '').slice(0, MAX_FIELD_LENGTH).trim();
 }
 
 export async function POST(req: Request) {
@@ -30,10 +31,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: 'Terlalu banyak permintaan. Tunggu sebentar.' }, { status: 429 });
   }
 
+  let body;
   try {
-    const body = await req.json();
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ success: false, error: 'Format JSON tidak valid.' }, { status: 400 });
+  }
 
-    if (!body || !body.deskripsi || !body.location) {
+  try {
+    if (!body || typeof body !== 'object' || !body.deskripsi || !body.location) {
       return NextResponse.json({
         success: false,
         error: 'Missing required fields: deskripsi or location',

@@ -49,8 +49,11 @@ export function PhotoUploader() {
     return () => clearInterval(interval);
   }, [isLoading]);
 
-  const handleFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
+  const handleFile = async (incomingFile: File) => {
+    let file = incomingFile;
+    const isHeic = file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+    
+    if (!file.type.startsWith('image/') && !isHeic) {
       setError(t('Tolong unggah file gambar yang valid.', 'Please upload a valid image file.'));
       return;
     }
@@ -63,6 +66,28 @@ export function PhotoUploader() {
 
     // Client-side image compression & base64 conversion
     try {
+      if (isHeic) {
+        setIsLoading(true);
+        // Load heic2any dynamically from unpkg CDN
+        if (!(window as any).heic2any) {
+          const script = document.createElement('script');
+          script.src = 'https://unpkg.com/heic2any@0.0.4/dist/heic2any.js';
+          document.head.appendChild(script);
+          await new Promise((resolve) => {
+            script.onload = resolve;
+          });
+        }
+        const heic2any = (window as any).heic2any;
+        const convertedBlob = await heic2any({
+          blob: file,
+          toType: 'image/jpeg',
+          quality: 0.8
+        });
+        const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        file = new File([blob], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
+        setIsLoading(false);
+      }
+
       const compressedFile = await compressImage(file);
       setSelectedFile(compressedFile);
       
@@ -73,7 +98,7 @@ export function PhotoUploader() {
       };
       reader.readAsDataURL(compressedFile);
     } catch (e) {
-      console.error("Compression failed, using original file.", e);
+      console.error("Processing failed, using original file.", e);
       setWarning(t('Kompresi gambar gagal, menggunakan file asli. Pastikan foto jelas dan tidak rusak.', 'Image compression failed, using original file. Ensure the photo is clear and not corrupted.'));
       setSelectedFile(file);
 
@@ -82,6 +107,8 @@ export function PhotoUploader() {
         setPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -268,7 +295,7 @@ export function PhotoUploader() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <input 
               type="file" 
-              accept="image/*" 
+              accept="image/*,.heic,.heif" 
               capture="environment" 
               ref={cameraInputRef} 
               className="hidden" 
@@ -284,7 +311,7 @@ export function PhotoUploader() {
 
             <input 
               type="file" 
-              accept="image/*" 
+              accept="image/*,.heic,.heif" 
               ref={fileInputRef} 
               className="hidden" 
               onChange={handleFileChange}
@@ -297,7 +324,7 @@ export function PhotoUploader() {
               {t('Dari Galeri', 'From Gallery')}
             </button>
           </div>
-          <p className="text-xs text-gray-400 mt-6 font-medium tracking-widest uppercase">JPG, PNG, WEBP (Max 15MB)</p>
+          <p className="text-xs text-gray-400 mt-6 font-medium tracking-widest uppercase">JPG, PNG, WEBP, HEIC (Max 15MB)</p>
 
           <div className="mt-12 pt-8 border-t border-gray-200">
             <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-4">{t('Atau gunakan foto sampel untuk demo:', 'Or use sample photo for demo:')}</p>

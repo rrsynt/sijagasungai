@@ -261,14 +261,22 @@ export default function PreventionPageClient() {
           ))}
         </div>
 
-        <a
-          href={`https://wa.me/628111262220?text=${encodeURIComponent('Halo KKP, saya menemukan spesies invasif dan membutuhkan panduan pemusnahan yang layak. #SiJagaSungai')}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center px-8 py-4 bg-gray-900 text-white font-bold text-sm hover:bg-gray-800 transition-colors"
-        >
-          {t('Hubungi KKP via WhatsApp', 'Contact KKP via WhatsApp')} →
-        </a>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <a
+            href={`https://wa.me/628111262220?text=${encodeURIComponent('Halo KKP, saya menemukan spesies invasif dan membutuhkan panduan pemusnahan yang layak. #SiJagaSungai')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center px-8 py-4 bg-gray-900 text-white font-bold text-sm hover:bg-gray-800 transition-colors"
+          >
+            💬 {t('Hubungi KKP via WhatsApp', 'Contact KKP via WhatsApp')}
+          </a>
+          <a
+            href="tel:1500415"
+            className="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-900 text-gray-900 font-bold text-sm hover:bg-gray-50 transition-colors"
+          >
+            📞 {t('Telepon Call Center KKP (1500-415)', 'Call KKP Call Center (1500-415)')}
+          </a>
+        </div>
       </section>
 
     </div>

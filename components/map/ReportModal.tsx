@@ -119,8 +119,9 @@ export function ReportModal({ onClose, onSuccess, initialSpeciesName }: ReportMo
           setGpsLoading(true);
           navigator.geolocation.getCurrentPosition(
             async (pos) => {
-              const { latitude, longitude } = pos.coords;
+              const { latitude, longitude, accuracy } = pos.coords;
               setCoords({ lat: latitude, lng: longitude });
+              setGpsAccuracy(accuracy);
               try {
                 const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
                 const data = await res.json();
@@ -218,6 +219,7 @@ export function ReportModal({ onClose, onSuccess, initialSpeciesName }: ReportMo
   };
 
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [gpsAccuracy, setGpsAccuracy] = useState<number | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
 
@@ -232,8 +234,9 @@ export function ReportModal({ onClose, onSuccess, initialSpeciesName }: ReportMo
     setGpsLoading(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const { latitude, longitude } = pos.coords;
+        const { latitude, longitude, accuracy } = pos.coords;
         setCoords({ lat: latitude, lng: longitude });
+        setGpsAccuracy(accuracy);
         try {
           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
           const data = await res.json();
@@ -740,7 +743,11 @@ export function ReportModal({ onClose, onSuccess, initialSpeciesName }: ReportMo
                 <label className="block text-sm font-semibold text-gray-700">
                   {t('Lokasi', 'Location')} <span className="text-red-500">*</span>
                 </label>
-                {coords && <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1">📍 {t('GPS aktif', 'GPS active')}</span>}
+                {coords && (
+                  <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
+                    📍 {t('GPS aktif', 'GPS active')} {gpsAccuracy !== null && `(±${Math.round(gpsAccuracy)}m)`}
+                  </span>
+                )}
               </div>
               <div className="flex gap-2">
                 <div className="relative flex-1">

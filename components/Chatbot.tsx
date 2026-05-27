@@ -21,6 +21,7 @@ export function Chatbot() {
   const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [activeModel, setActiveModel] = useState<string>('Gemini AI');
 
   useEffect(() => {
     if (messages.length <= 1) {
@@ -106,6 +107,7 @@ export function Chatbot() {
       const data = await res.json();
       if (data.success) {
         setMessages([...newMessages, { role: 'model', parts: [{ text: data.text }] }]);
+        if (data.model) setActiveModel(data.model);
       } else {
         setMessages([...newMessages, { role: 'model', parts: [{ text: t('Maaf, sistem saya sedang gangguan. Coba lagi nanti ya!', 'Sorry, my system is currently experiencing issues. Please try again later!') }] }]);
       }
@@ -152,7 +154,9 @@ export function Chatbot() {
             </div>
             <div>
               <h3 className="font-bold leading-tight">SiJaga AI</h3>
-              <p className="text-xs text-blue-200">{t('Tahan & seret untuk pindah', 'Hold & drag to move')}</p>
+              <p className="text-xs text-blue-200">
+                {activeModel === 'Gemini AI' ? '🤖 ' + t('Gemini AI Aktif', 'Gemini AI Active') : `🤖 ${activeModel}`}
+              </p>
             </div>
           </div>
           <button
@@ -224,7 +228,12 @@ export function Chatbot() {
                   })
                     .then(r => r.json())
                     .then(d => {
-                      setMessages([...newMessages, { role: 'model', parts: [{ text: d.success ? d.text : t('Maaf, coba lagi nanti ya!', 'Sorry, please try again later!') }] }]);
+                      if (d.success) {
+                        setMessages([...newMessages, { role: 'model', parts: [{ text: d.text }] }]);
+                        if (d.model) setActiveModel(d.model);
+                      } else {
+                        setMessages([...newMessages, { role: 'model', parts: [{ text: t('Maaf, coba lagi nanti ya!', 'Sorry, please try again later!') }] }]);
+                      }
                     })
                     .catch(() => setMessages([...newMessages, { role: 'model', parts: [{ text: t('Koneksi terputus.', 'Connection lost.') }] }]))
                     .finally(() => setIsLoading(false));

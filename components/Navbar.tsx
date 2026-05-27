@@ -27,7 +27,6 @@ export function Navbar() {
   const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOnline(navigator.onLine);
     const updateRank = () => {
       const state = getGamificationState();

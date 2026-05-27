@@ -3,13 +3,13 @@ import { geminiService } from '@/lib/gemini';
 import { findSpeciesByName } from '@/lib/species-database';
 import { unstable_cache } from 'next/cache';
 
-const getCachedEducationCard = unstable_cache(
-  async (speciesId: string, ageGroup: string, lang: string) => {
+const getCachedEducationCard = (speciesId: string, ageGroup: string, lang: string) => unstable_cache(
+  async () => {
     return await geminiService.generateEducationCard(speciesId, ageGroup, lang);
   },
-  ['education-card-cache'],
+  ['education-species-card-cache', speciesId, ageGroup, lang],
   { revalidate: 3600 }
-);
+)();
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

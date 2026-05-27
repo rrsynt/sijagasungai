@@ -58,7 +58,22 @@ export async function POST(request: Request) {
       }
     }
 
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { success: false, error: 'Format JSON tidak valid.' },
+        { status: 400 }
+      );
+    }
+
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json(
+        { success: false, error: 'Body harus berupa objek JSON.' },
+        { status: 400 }
+      );
+    }
 
     // Validate required fields
     if (!body.speciesName || !body.locationName || body.quantity === undefined) {
@@ -68,20 +83,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Sanitize strings (strip HTML tags)
-    const speciesName = stripHtml(String(body.speciesName));
-    const locationName = stripHtml(String(body.locationName));
+    // Sanitize strings (strip HTML tags) and limit lengths
+    const speciesName = stripHtml(String(body.speciesName)).slice(0, 100);
+    const locationName = stripHtml(String(body.locationName)).slice(0, 200);
 
     // Length validation
-    if (speciesName.length < 3 || speciesName.length > 100) {
+    if (speciesName.length < 3) {
       return NextResponse.json(
-        { success: false, error: 'Nama spesies harus antara 3–100 karakter.' },
+        { success: false, error: 'Nama spesies harus minimal 3 karakter.' },
         { status: 400 }
       );
     }
-    if (locationName.length < 3 || locationName.length > 200) {
+    if (locationName.length < 3) {
       return NextResponse.json(
-        { success: false, error: 'Nama lokasi harus antara 3–200 karakter.' },
+        { success: false, error: 'Nama lokasi harus minimal 3 karakter.' },
         { status: 400 }
       );
     }
@@ -112,7 +127,7 @@ export async function POST(request: Request) {
     }
 
     // Validate imageUrl size - reject if > 270KB base64
-    if (body.imageUrl && body.imageUrl.length > 270000) {
+    if (body.imageUrl && String(body.imageUrl).length > 270000) {
       return NextResponse.json(
         { success: false, error: 'Ukuran foto terlalu besar. Kompresi otomatis gagal, coba foto lain.' },
         { status: 413 }
@@ -121,18 +136,21 @@ export async function POST(request: Request) {
 
     const reportData: ReportData = {
       speciesName,
-      scientificName: stripHtml(String(body.scientificName || '')),
-      invasiveStatus: body.invasiveStatus || 'UNKNOWN',
+      scientificName: stripHtml(String(body.scientificName || '')).slice(0, 100),
+      invasiveStatus: stripHtml(String(body.invasiveStatus || 'UNKNOWN')).slice(0, 50),
       locationName,
-      latitude: body.latitude,
-      longitude: body.longitude,
+      latitude: body.latitude !== undefined ? Number(body.latitude) : undefined,
+      longitude: body.longitude !== undefined ? Number(body.longitude) : undefined,
       quantity,
-      waterCondition: body.waterCondition || 'Unknown',
-      reporterInitial: body.reporterInitial,
+      waterCondition: stripHtml(String(body.waterCondition || 'Unknown')).slice(0, 50),
+      reporterInitial: stripHtml(String(body.reporterInitial || 'Anon')).slice(0, 10),
       reportedAt: new Date(),
-      urgency: body.urgency || 'SEDANG',
-      imageUrl: body.imageUrl || undefined,
+      urgency: stripHtml(String(body.urgency || 'SEDANG')).slice(0, 50),
     };
+
+    if (body.imageUrl) {
+      reportData.imageUrl = String(body.imageUrl);
+    }
 
     // Save to Firestore
     const reportId = await saveReport(reportData);

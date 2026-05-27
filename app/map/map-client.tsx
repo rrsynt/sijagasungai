@@ -25,7 +25,6 @@ function MapContent() {
   // Must run in useEffect — not lazy initializer — to avoid SSR/client hydration mismatch
   useEffect(() => {
     if (searchParams.get('report') || searchParams.get('open') === 'report') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowModal(true);
     }
   }, [searchParams]);

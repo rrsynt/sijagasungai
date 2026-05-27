@@ -55,7 +55,6 @@ function EconomyForm() {
   useEffect(() => {
     // If prefilled species from URL is valid, trigger calculation immediately
     if (prefilledSpecies && SPECIES_DATABASE[prefilledSpecies]) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       handleCalculate(new Event('submit') as any);
     }
   }, [prefilledSpecies, handleCalculate]);

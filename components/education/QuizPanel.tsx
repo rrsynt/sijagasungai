@@ -33,7 +33,7 @@ export function QuizPanel({ speciesId, onFinish }: QuizPanelProps) {
       try {
         const res = await fetch(`/api/education/quiz/${speciesId}?lang=${language}`);
         const data = await res.json();
-        if (data.success && data.data.kuis) {
+        if (data.success && Array.isArray(data.data?.kuis)) {
           setQuestions(data.data.kuis); 
         }
       } catch (e) {
@@ -46,9 +46,20 @@ export function QuizPanel({ speciesId, onFinish }: QuizPanelProps) {
   }, [speciesId, language]);
 
   useEffect(() => {
-    if (finished && onFinish) {
-      const badgeTitle = score === questions.length ? t('Pakar', 'Expert') : t('Pengamat', 'Observer');
-      onFinish(`${badgeTitle} (${speciesId})`);
+    if (finished) {
+      if (score === questions.length) {
+        import('canvas-confetti').then((confetti) => {
+          confetti.default({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        });
+      }
+      if (onFinish) {
+        const badgeTitle = score === questions.length ? t('Pakar', 'Expert') : t('Pengamat', 'Observer');
+        onFinish(`${badgeTitle} (${speciesId})`);
+      }
     }
   }, [finished, score, questions.length, speciesId, onFinish, t]);
 
@@ -56,7 +67,7 @@ export function QuizPanel({ speciesId, onFinish }: QuizPanelProps) {
     return <div className="py-12"><LoadingSpinner text={t('Menyiapkan kuis...', 'Preparing quiz...')} /></div>;
   }
 
-  if (questions.length === 0) {
+  if (!Array.isArray(questions) || questions.length === 0) {
     return <div className="p-6 text-center text-gray-500">{t('Kuis tidak tersedia.', 'Quiz not available.')}</div>;
   }
 

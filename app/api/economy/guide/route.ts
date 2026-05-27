@@ -3,9 +3,22 @@ import { geminiService } from '@/lib/gemini';
 import { findSpeciesByName } from '@/lib/species-database';
 
 export async function POST(request: Request) {
+  let body;
   try {
-    const body = await request.json();
-    const { speciesId, pathway, lang } = body;
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ success: false, error: 'Format JSON tidak valid.' }, { status: 400 });
+  }
+
+  try {
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ success: false, error: 'Body harus berupa objek JSON.' }, { status: 400 });
+    }
+
+    const cleanStr = (val: unknown) => String(val || '').replace(/<[^>]*>/g, '').trim();
+    const speciesId = cleanStr(body.speciesId).slice(0, 100);
+    const pathway = cleanStr(body.pathway).slice(0, 100);
+    const lang = body.lang ? cleanStr(body.lang).slice(0, 10) : 'id';
 
     if (!speciesId || !pathway) {
       return NextResponse.json({ success: false, error: 'speciesId and pathway are required' }, { status: 400 });
