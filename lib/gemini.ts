@@ -404,6 +404,10 @@ TUGASMU: Analisis foto dan kembalikan HANYA JSON valid berikut (tidak ada teks l
 ATURAN: fotoKurangJelas = true HANYA jika foto benar-benar buram/gelap total. Foto akuarium yang jelas = fotoKurangJelas false.`;
 
     const content = await fallbackChain.tryChain(async (apiKey, provider) => {
+      // Groq and OpenRouter support response_format for vision — enforce JSON output.
+      // Hyperbolic may not, so we skip it there and rely on parseJsonResponse.
+      const supportsJsonFormat = provider.name === 'Groq' || provider.name === 'OpenRouter';
+
       const res = await fetch(`${provider.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -420,8 +424,7 @@ ATURAN: fotoKurangJelas = true HANYA jika foto benar-benar buram/gelap total. Fo
               { type: 'text', text: prompt },
             ],
           }],
-          // NOTE: response_format NOT set — not all vision providers support it.
-          // parseJsonResponse() already handles raw JSON and markdown-fenced JSON.
+          ...(supportsJsonFormat ? { response_format: { type: 'json_object' } } : {}),
           temperature: 0.1,
           max_tokens: 2048,
         }),
