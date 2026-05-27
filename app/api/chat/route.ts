@@ -18,7 +18,6 @@ let geminiIdx = 0;
 interface OAIProvider { name: string; baseUrl: string; keys: string[]; model: string; extraHeaders?: Record<string, string>; }
 const oaiProviders: OAIProvider[] = [
   { name: 'Groq',       baseUrl: 'https://api.groq.com/openai/v1',  keys: parseKeys('GROQ_API_KEYS', 'GROQ_API_KEY'),             model: 'llama-3.3-70b-versatile' },
-  { name: 'OpenRouter', baseUrl: 'https://openrouter.ai/api/v1',    keys: parseKeys('OPENROUTER_API_KEYS', 'OPENROUTER_API_KEY'), model: 'google/gemini-2.0-flash-exp:free', extraHeaders: { 'HTTP-Referer': 'https://sijaga-sungai.app', 'X-Title': 'SiJaga Sungai' } },
   { name: 'Hyperbolic', baseUrl: 'https://api.hyperbolic.xyz/v1',   keys: parseKeys('HYPERBOLIC_API_KEYS', 'HYPERBOLIC_API_KEY'), model: 'meta-llama/Llama-3.3-70B-Instruct' },
 ].filter(p => p.keys.length > 0);
 
