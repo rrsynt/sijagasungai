@@ -160,7 +160,7 @@ export default function DashboardPage() {
       const key = `${year}-${month}`;
       months.push({
         month: INDO_MONTHS[month],
-        count: mapCount[key] || ((i * 7 + 11) % 4) + 2, // stable deterministic fallback for visual trend
+        count: mapCount[key] || 0, // use actual count, 0 if no data
       });
     }
 
