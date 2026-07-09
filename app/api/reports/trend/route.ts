@@ -11,7 +11,7 @@ export async function GET() {
     // Return deterministic dummy trend data for development
     const months = [];
     const now = new Date();
-    const dummyCounts = [2, 4, 3, 7, 5, 9];
+    const dummyCounts = [0, 4, 15, 12, 0, 0];
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       months.push({
