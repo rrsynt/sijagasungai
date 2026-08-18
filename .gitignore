@@ -12,3 +12,8 @@ localhost_*.json
 parse_lighthouse.js
 
 .cloudrun-env.yaml
+
+# Cache inkremental TypeScript. Regenerated tiap build, isinya path absolut
+# mesin pembuatnya -- tidak berguna direview dan selalu bentrok antar mesin.
+# Ter-track sejak commit pertama; dilepas 2026-08-18.
+*.tsbuildinfo
