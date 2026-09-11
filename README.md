@@ -1,8 +1,8 @@
 # 🐟 SiJaga Sungai
 
-**Platform citizen science berbasis AI untuk identifikasi, pelaporan, dan pemanfaatan spesies ikan invasif di perairan Indonesia.**
+**An AI-powered citizen-science platform for identifying, reporting and making use of invasive fish species in Indonesian freshwaters.**
 
-> *Satu Foto. Tiga Dampak.* — Identifikasi · Laporkan · Manfaatkan
+> *One photo. Three outcomes.* — Identify · Report · Make it count
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Cloud%20Run-4285F4?style=for-the-badge&logo=google-cloud)](https://sijaga-sungai-701628588260.asia-southeast1.run.app)
 [![#JuaraVibeCoding](https://img.shields.io/badge/%23JuaraVibeCoding-Google-4285F4?style=flat-square&logo=google)](https://rsvp.withgoogle.com/events/juaravibecoding)
@@ -11,89 +11,109 @@
 [![Cloud Run](https://img.shields.io/badge/Deploy-Cloud%20Run-4285F4?style=flat-square&logo=google-cloud)](https://cloud.google.com/run)
 [![PWA](https://img.shields.io/badge/PWA-Installable-5BB974?style=flat-square)](https://web.dev/progressive-web-apps/)
 
-🔗 **Demo:** https://sijaga-sungai-701628588260.asia-southeast1.run.app
+🔗 **Live demo:** https://sijaga-sungai-701628588260.asia-southeast1.run.app
+
+> 🇮🇩 Versi Bahasa Indonesia: [README.id.md](README.id.md)
 
 ---
 
-## Masalah yang Dipecahkan
+<!--
+## Screenshots
 
-Indonesia memiliki **150+ sungai** yang terdampak spesies ikan invasif seperti Sapu-sapu (*Pterygoplichthys*), Aligator Gar, Peacock Bass, dan Piranha. Menurut data **KKP**, kerugian ekologi akibat spesies invasif di perairan tawar Indonesia mencapai **miliaran rupiah per tahun** dan terus meningkat.
+Capture these from the live demo (mobile view looks best — this is a PWA),
+save them into docs/screenshots/, then remove the comment markers.
 
-Mayoritas masyarakat — khususnya nelayan kecil — tidak tahu cara:
-1. **Mengidentifikasi** spesies yang ditangkap
-2. **Melaporkan** temuan ke pihak berwenang
-3. **Memanfaatkan** tangkapan invasif secara ekonomi
-4. **Membuang** spesies berbahaya dengan cara yang aman dan legal
+| AI identification | Distribution map |
+|---|---|
+| ![AI identification](docs/screenshots/01-identify.png) | ![Distribution map](docs/screenshots/02-map.png) |
 
-**SiJaga Sungai** mengisi keempat celah ini dalam satu platform yang bisa diakses dari HP.
-
----
-
-## Fitur Lengkap
-
-### 📸 Identifikasi AI — Dua Metode
-
-**Via Foto (Gemini Vision):**
-- Upload foto → AI analisis dalam detik
-- Status invasif: DARURAT / KRITIS / TINGGI / SEDANG / TIDAK INVASIF
-- Nama ilmiah, asal negara, estimasi ukuran, dampak ekologi
-- Rekomendasi aksi konkret dari AI (`rekomendasiAksi`)
-
-**Via Deskripsi Teks** *(tanpa foto)*:
-- Isi form: warna, bentuk mulut, ciri khas, ukuran, habitat, lokasi
-- AI menampilkan kandidat spesies dengan persentase kemungkinan
-- Link langsung ke nilai ekonomi / edukasi per kandidat
-- Berguna saat ikan sudah lepas atau tidak sempat difoto
-
-### 🗺️ Peta Persebaran Nasional
-- Peta interaktif (Google Maps) laporan citizen scientist seluruh Indonesia
-- **GPS auto-detect** + reverse geocoding via Nominatim (nama kota otomatis terisi, tanpa API key tambahan)
-- Mini bar chart tren laporan 6 bulan terakhir di header peta
-- Toggle Heatmap (zona merah) ↔ Titik Laporan
-- Data tersimpan di Firebase Firestore untuk riset dan kebijakan
-
-### ⚠️ Panduan Pemanfaatan & Pemusnahan
-Setelah identifikasi, app otomatis menampilkan panduan yang sesuai status spesies:
-- **Spesies dengan nilai ekonomi** → badge jalur pemanfaatan + link langsung ke kalkulator
-- **Spesies DARURAT tanpa nilai ekonomi** (Piranha, Aligator Gar) → 5 langkah pemusnahan layak sesuai **Permen KP No. 19/2020** + tombol **"Lapor ke KKP via WhatsApp"** (0811-1262-220 dengan pesan pra-isi)
-
-### 💰 Kalkulator Nilai Ekonomi + "Jual ke Mana?"
-- Hitung potensi penghasilan per kg berdasarkan spesies & lokasi (Gemini AI)
-- **Direktori pembeli**: pabrik tepung ikan, peternak lele, pengepul pupuk, komunitas aquascape, restoran, BRIN
-- **Panduan proses step-by-step** (accordion):
-  - 🌾 Cara membuat tepung ikan skala rumah tangga
-  - 🌱 Cara fermentasi Pupuk Cair Organik (POC) dengan EM4
-  - 🍽️ Cara mengolah Sapu-sapu untuk konsumsi (termasuk teknik membuka sisik armor)
-
-### 🛡️ Panduan Pencegahan
-- 6 tips actionable: jangan lepas ikan hias, sterilisasi peralatan antar perairan, karantina ikan baru
-- Tabel spesies yang dilarang (Piranha, Aligator Gar, Arapaima) dengan referensi regulasi
-- CTA ke identifikasi dan pelaporan
-
-### 📚 Ensiklopedia + Kuis Gamifikasi
-- Kartu edukasi per spesies dihasilkan AI dengan storytelling engaging
-- Mini kuis 4 opsi dengan penjelasan jawaban
-- Bilingual (Bahasa Indonesia & English)
-
-### 📤 Social Sharing Terintegrasi
-- **Setelah identifikasi**: tombol "Bagikan Temuan" → copy teks terformat + hashtag `#SiJagaSungai #JuaraVibeCoding`
-- **Setelah laporan**: copy draft sosmed (Instagram / Twitter/X / WhatsApp) per platform dengan satu klik
-
-### 📱 Progressive Web App (PWA)
-- Installable di Android/iOS langsung dari browser
-- Web manifest + meta tags dikonfigurasi untuk home screen
-- Offline support: laporan tersimpan lokal & di-sync otomatis saat kembali online
+| Home | Economic use |
+|---|---|
+| ![Home](docs/screenshots/03-home.png) | ![Economic use](docs/screenshots/04-economy.png) |
+-->
 
 ---
 
-## Tech Stack
+## The problem
 
-| Layer | Teknologi |
+Indonesia has **150+ rivers** affected by invasive fish species such as the sailfin catfish (*Pterygoplichthys*), alligator gar, peacock bass and piranha. According to **KKP** (the Ministry of Marine Affairs and Fisheries), the ecological damage caused by invasive species in Indonesian freshwaters runs into **billions of rupiah per year** and keeps rising.
+
+Most people — small-scale fishers in particular — do not know how to:
+
+1. **Identify** what they have caught
+2. **Report** the finding to the authorities
+3. **Sell or process** an invasive catch
+4. **Dispose** of dangerous species safely and legally
+
+**SiJaga Sungai** addresses all four gaps in a single platform that runs on a phone.
+
+---
+
+## Features
+
+### 📸 AI identification — two methods
+
+**From a photo (Gemini Vision):**
+- Upload a photo → AI analysis within seconds
+- Invasiveness status: CRITICAL / SEVERE / HIGH / MODERATE / NOT INVASIVE
+- Scientific name, country of origin, estimated size, ecological impact
+- Concrete recommended actions from the model
+
+**From a text description** *(no photo needed)*:
+- Fill in a form: colour, mouth shape, distinguishing features, size, habitat, location
+- AI returns candidate species ranked by likelihood
+- Each candidate links straight to its economic value and educational card
+- Useful when the fish escaped, or when there was no time to photograph it
+
+### 🗺️ National distribution map
+- Interactive Google Maps view of citizen-scientist reports across Indonesia
+- **GPS auto-detect** with reverse geocoding via Nominatim (place names filled in automatically, no extra API key)
+- Mini bar chart of the last 6 months of reporting activity in the map header
+- Toggle between heatmap zones and individual report pins
+- Data stored in Firebase Firestore for research and policy use
+
+### ⚠️ Handling and disposal guidance
+After identification, the app shows guidance matched to the species' status:
+- **Species with economic value** → utilisation pathway badge and a direct link to the calculator
+- **CRITICAL species with no economic value** (piranha, alligator gar) → a 5-step lawful disposal procedure per **Permen KP No. 19/2020**, plus a **"Report to KKP via WhatsApp"** button with a pre-filled message
+
+### 💰 Economic value calculator + "where to sell"
+- Estimates potential income per kilogram by species and location (Gemini)
+- **Buyer directory**: fishmeal plants, catfish farms, fertiliser collectors, aquascaping communities, restaurants, BRIN
+- **Step-by-step processing guides** in accordions:
+  - 🌾 Making fishmeal at household scale
+  - 🌱 Fermenting organic liquid fertiliser (POC) with EM4
+  - 🍽️ Preparing sailfin catfish for consumption, including how to open the armoured scales
+
+### 🛡️ Prevention guidance
+- Six actionable tips: never release ornamental fish, sterilise equipment between water bodies, quarantine new fish
+- Table of prohibited species (piranha, alligator gar, arapaima) with regulatory references
+- Calls to action into identification and reporting
+
+### 📚 Encyclopaedia + gamified quiz
+- AI-generated educational cards per species, written as engaging short-form storytelling
+- Four-option mini quizzes with explained answers
+- Bilingual (Bahasa Indonesia and English)
+
+### 📤 Built-in social sharing
+- **After identification**: "Share this finding" produces formatted text with the `#SiJagaSungai #JuaraVibeCoding` hashtags
+- **After reporting**: one-click copy of a ready-to-post draft for Instagram, X/Twitter or WhatsApp
+
+### 📱 Progressive Web App
+- Installable on Android and iOS straight from the browser
+- Web manifest and meta tags configured for the home screen
+- Offline support: reports are queued locally and synced automatically when the connection returns
+
+---
+
+## Tech stack
+
+| Layer | Technology |
 |---|---|
 | Framework | Next.js 15 (App Router + Server Components) |
 | AI | Google Gemini 2.0 Flash (`@google/genai`) |
 | Maps | Google Maps Platform (`@react-google-maps/api`) |
-| Geocoding | Nominatim OpenStreetMap (reverse geocoding, gratis) |
+| Geocoding | Nominatim / OpenStreetMap (reverse geocoding, free) |
 | Database | Firebase Firestore (Admin SDK) |
 | Styling | TailwindCSS 4 |
 | Deploy | Google Cloud Run (`asia-southeast1` — Jakarta) |
@@ -101,7 +121,7 @@ Setelah identifikasi, app otomatis menampilkan panduan yang sesuai status spesie
 
 ---
 
-## Cara Menjalankan Lokal
+## Running locally
 
 **Prerequisites:** Node.js 20+, npm
 
@@ -109,88 +129,90 @@ Setelah identifikasi, app otomatis menampilkan panduan yang sesuai status spesie
 # 1. Install dependencies
 npm install
 
-# 2. Buat file .env.local dari template
+# 2. Create .env.local from the template
 cp .env.example .env.local
-# Isi semua variabel (lihat .env.example untuk panduan)
+# Fill in every variable (see .env.example for guidance)
 
-# 3. Jalankan dev server
+# 3. Start the dev server
 npm run dev
 ```
 
-Buka [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000).
 
-**Seed data demo ke Firestore** (opsional, untuk mengisi peta saat demo):
+**Seeding demo data into Firestore** (optional — useful to populate the map for a demo):
+
 ```bash
 curl -X POST http://localhost:3000/api/seed \
   -H "Content-Type: application/json" \
-  -d '{"secret":"<SEED_SECRET dari .env.local>"}'
+  -d '{"secret":"<SEED_SECRET from .env.local>"}'
 ```
-Memasukkan 10 laporan realistis dari Jakarta, Surabaya, Bandung, Makassar, Gorontalo, Kalimantan, dll.
 
-> ⚠️ `SEED_SECRET` wajib diisi di `.env.local` — endpoint ini diproteksi dan tidak bisa diakses tanpa secret yang benar.
+This inserts ten realistic reports from Jakarta, Surabaya, Bandung, Makassar, Gorontalo, Kalimantan and elsewhere.
+
+> ⚠️ `SEED_SECRET` must be set in `.env.local`. The endpoint is protected and returns nothing without the correct secret.
 
 ---
 
-## Deploy ke Google Cloud Run
+## Deploying to Google Cloud Run
 
 ```bash
-# Edit PROJECT_ID di deploy.sh terlebih dahulu
+# Set PROJECT_ID in deploy.sh first
 chmod +x deploy.sh
 ./deploy.sh
 ```
 
-Script otomatis: enable APIs → build & push Docker image → deploy ke Cloud Run Jakarta → output URL.
+The script enables the required APIs, builds and pushes the Docker image, deploys to Cloud Run in Jakarta, and prints the resulting URL.
 
-**Environment variables wajib di Cloud Run:**
+**Environment variables required on Cloud Run:**
 
-| Variable | Sumber |
+| Variable | Source |
 |---|---|
 | `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/app/apikey) |
 | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | [Google Cloud Console](https://console.cloud.google.com) |
 | `FIREBASE_PROJECT_ID` | Firebase Console → Project Settings |
 | `FIREBASE_CLIENT_EMAIL` | Firebase Console → Service Accounts |
 | `FIREBASE_PRIVATE_KEY` | Firebase Console → Service Accounts |
-| `APP_URL` | URL Cloud Run setelah first deploy |
-| `SEED_SECRET` | String random untuk proteksi endpoint `/api/seed` |
+| `APP_URL` | The Cloud Run URL after the first deploy |
+| `SEED_SECRET` | Any random string, to protect the `/api/seed` endpoint |
 
 ---
 
-## Struktur Proyek
+## Project structure
 
 ```
 app/
-├── page.tsx              # Landing page (animated stats, factual data KKP)
-├── about/                # Tentang platform & #JuaraVibeCoding
-├── identify/             # Tab: Foto AI + Deskripsi Teks
-├── map/                  # Peta nasional + mini trend chart
-├── economy/              # Kalkulator + Jual ke Mana + Panduan Proses
-├── education/            # Ensiklopedia + kuis gamifikasi
-├── prevention/           # Panduan pencegahan & tabel regulasi
+├── page.tsx              # Landing page (animated stats, factual KKP data)
+├── about/                # About the platform & #JuaraVibeCoding
+├── identify/             # Tabs: AI photo + text description
+├── map/                  # National map + mini trend chart
+├── economy/              # Calculator + where to sell + processing guides
+├── education/            # Encyclopaedia + gamified quiz
+├── prevention/           # Prevention guidance & regulation table
 └── api/
     ├── identify/         # Gemini Vision endpoint
     ├── identify-text/    # Text-based identification
     ├── economy/          # Economic calculation (Gemini)
     ├── report/           # Firestore report submission
     ├── reports/trend/    # Monthly trend data (cached 5m)
-    ├── seed/             # Demo data seeding (dilindungi SEED_SECRET)
+    ├── seed/             # Demo data seeding (protected by SEED_SECRET)
     └── stats/            # Live report count (cached 1m)
 
 components/
 ├── identify/
 │   ├── PhotoUploader.tsx   # AI photo identification UI
-│   ├── IdentifyResult.tsx  # Results + utilization/disposal guidance
+│   ├── IdentifyResult.tsx  # Results + utilisation/disposal guidance
 │   └── TextIdentifier.tsx  # Text-based identification form
 ├── map/
-│   └── ReportModal.tsx     # Report form dengan GPS support
+│   └── ReportModal.tsx     # Report form with GPS support
 ├── economy/
 │   └── EconomyTable.tsx    # Economic pathway results
 └── home/                   # Hero, SpeciesSpotlight, RecentReports
 
 lib/
-├── gemini.ts               # Gemini AI service layer (key pool + fallback)
+├── gemini.ts               # Gemini service layer (key pool + fallback)
 ├── firestore.ts            # Firebase Admin operations
 ├── analytics.ts            # GA4 event tracking utility
-├── species-database.ts     # 10+ invasive species static data
+├── species-database.ts     # Static data for 10+ invasive species
 └── types.ts                # TypeScript interfaces
 
 firestore.rules             # Firestore security rules
@@ -198,45 +220,45 @@ firestore.rules             # Firestore security rules
 
 ---
 
-## Alur Pengguna Lengkap
+## End-to-end user flow
 
 ```
-Temukan ikan asing
+Spot an unfamiliar fish
        │
-       ├─ Punya foto? → /identify (tab Foto) → Hasil AI
+       ├─ Have a photo? → /identify (Photo tab) → AI result
        │                                            │
-       └─ Tidak ada foto? → /identify (tab Teks) → Kandidat spesies
+       └─ No photo? → /identify (Text tab) → Ranked candidates
                                                           │
                                       ┌────────────────────┤
                                       │                    │
-                          Ada nilai ekonomi?           DARURAT?
+                          Has economic value?         CRITICAL?
                                       │                    │
-                                 /economy             Panduan buang
-                            (Hitung → Jual → Proses)  + WA KKP 0811-1262-220
+                                 /economy             Disposal guide
+                            (Value → Sell → Process)  + WhatsApp KKP
                                       │
-                                   /map (Lapor GPS)
+                                   /map (report with GPS)
                                       │
-                                  Share sosmed 📤
+                                  Share to social 📤
 ```
 
 ---
 
-## Dampak & Skalabilitas
+## Impact and scalability
 
-- **Nelayan & Pemancing**: Mengubah "hama" jadi penghasilan — tahu nilainya, cara prosesnya, ke mana menjualnya
-- **Pemerintah (KKP/BRIN)**: Data distribusi real-time dari ribuan titik laporan citizen scientist
-- **Peneliti**: Peta persebaran spesies invasif yang terus diperbarui komunitas
-- **Komunitas & Pelajar**: Edukasi ekologi perairan via gamifikasi dan ensiklopedia interaktif
+- **Fishers and anglers** — turn a nuisance species into income: know what it is worth, how to process it, and who buys it
+- **Government (KKP / BRIN)** — real-time distribution data from thousands of citizen-science reports
+- **Researchers** — an invasive-species distribution map that the community keeps updating
+- **Communities and students** — freshwater ecology education through gamification and interactive reference material
 
 ---
 
-## Dibuat untuk #JuaraVibeCoding
+## Built for #JuaraVibeCoding
 
-Dibangun sepenuhnya dengan AI-assisted coding sebagai bukti bahwa teknologi dapat mempercepat solusi atas masalah lingkungan nyata.
+Built entirely with AI-assisted coding, as a demonstration that the technology can accelerate real solutions to real environmental problems.
 
-## Tim
+## Team
 
-| Nama | Peran |
+| Name | Role |
 |---|---|
 | **Ratri Risyanto** | Full-Stack Developer |
 | **Gemini AI** | AI Engineer (Vision & Text) |
@@ -245,7 +267,7 @@ Dibangun sepenuhnya dengan AI-assisted coding sebagai bukti bahwa teknologi dapa
 
 ---
 
-> *"Lindungi sungai kita, satu laporan dalam satu waktu."*
+> *"Protect our rivers, one report at a time."*
 
 ![Build](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-15.5-black?style=flat-square&logo=next.js)
