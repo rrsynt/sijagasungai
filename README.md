@@ -49,6 +49,48 @@ Most people — small-scale fishers in particular — do not know how to:
 
 ---
 
+## Architecture
+
+```mermaid
+flowchart LR
+    U["Visitor<br/>phone browser / installed PWA"]
+
+    subgraph CR["Cloud Run — asia-southeast1 (Jakarta)"]
+        subgraph NX["Next.js 15 · App Router"]
+            PAGES["Pages<br/>/ · /identify · /map<br/>/economy · /education · /prevention"]
+            API["Route handlers<br/>/api/identify · /api/identify-text<br/>/api/economy · /api/report<br/>/api/stats · /api/reports/trend"]
+        end
+        LIB["lib/gemini.ts<br/>key pool + fallback"]
+    end
+
+    subgraph G["Google Cloud"]
+        GEM["Gemini 2.0 Flash<br/>vision + text"]
+        MAPS["Maps Platform"]
+        GA["Analytics 4"]
+    end
+
+    FS[("Firebase Firestore")]
+    NOM["Nominatim / OSM<br/>reverse geocoding"]
+
+    U --> PAGES
+    PAGES --> API
+    API --> LIB
+    LIB --> GEM
+    API -->|"report + GPS"| FS
+    FS -->|"distribution data"| API
+    PAGES --> MAPS
+    API --> NOM
+    PAGES --> GA
+```
+
+Identification runs through a single service layer, `lib/gemini.ts`, which holds a **key pool with automatic fallback** — so one exhausted or rate-limited API key degrades latency rather than taking the feature down.
+
+Firestore reads are served through cached route handlers (`/api/stats` 1 minute, `/api/reports/trend` 5 minutes) so a public map with heavy read traffic stays cheap.
+
+Every visitor-facing key is server-side; the browser only ever talks to this app's own routes.
+
+---
+
 ## Features
 
 ### 📸 AI identification — two methods
